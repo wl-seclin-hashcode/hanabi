@@ -18,16 +18,22 @@ case class GameState(currentPlayer : Int,
   def numPlayer = playersHands.size
   def activeHand = playersHands(currentPlayer)
 
+  def play(move: Move) = move match {
+    case _ : LevelHint | _ : ColorHint ⇒ hint
+    case PlayCard(cardPos)             ⇒ playCard(cardPos)
+    case Discard(cardPos)              ⇒ discard(cardPos)
+  }
+
   private def nextPlayer: GameState = copy(currentPlayer = (currentPlayer + 1) % numPlayer)
 
   private def updateHand(newHand: Hand): GameState = copy(playersHands = playersHands.updated(currentPlayer, newHand))
 
-  def hint = {
+  private def hint = {
     require(remainingHint > 0)
     copy(remainingHint = remainingHint -1).nextPlayer
   }
 
-  def play(pos: Int) = {
+  private def playCard(pos: Int) = {
     val (played, hand) = activeHand.play(pos)
     val (drawn, newDeck) = deck.draw
     val success = played.level == table(played.color) + 1
@@ -47,7 +53,7 @@ case class GameState(currentPlayer : Int,
     r.updateHand(hand + drawn).nextPlayer
   }
 
-  def discard(pos: Int) = {
+  private def discard(pos: Int) = {
     val (played, hand) = activeHand.play(pos)
     val (drawn, newDeck) = deck.draw
     val r = copy(

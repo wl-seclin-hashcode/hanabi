@@ -51,4 +51,14 @@ package object hanabi {
     }
     def +(c:Card) = Hand(cards :+ c)
   }
+
+  trait Player {
+    def nextMove(state: GameState): Move
+  }
+
+  trait Move
+  case class ColorHint(playerId: Int, color: Card.Color) extends Move
+  case class LevelHint(playerId: Int, level: Int) extends Move
+  case class PlayCard(cardPos: Int) extends Move
+  case class Discard(cardPos: Int) extends Move
 }
