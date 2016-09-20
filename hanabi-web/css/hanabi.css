@@ -1,0 +1,45 @@
+.card {
+    font-family: monospace;
+    border: thin solid;
+    font-size: xx-large;
+}
+
+.card-red {
+    /*background-color: #b92c28;
+    #color: #f5f5f5;*/
+    color: #fff;
+    background-color: #d9534f;
+    border-color: #d43f3a;
+}
+
+.card-blue {
+    color: #fff;
+    background-color: #428bca;
+    border-color: #428bca;
+}
+
+.card-green {
+    color: #fff;
+    background-color: #5cb85c;
+    border-color: #4cae4c;
+}
+
+.card-white {
+    color: #333;
+    background-color: #fff;
+    border-color: #ccc;
+}
+
+.card-yellow {
+    color: #333;
+    background-color: #ffff33;
+    border-color: lime;
+}
+
+.clue {
+    color: #428bca;
+}
+
+.used-life {
+    color: #d43f3a;
+}
