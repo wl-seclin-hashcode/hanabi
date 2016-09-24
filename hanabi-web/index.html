@@ -26,6 +26,12 @@
     <script src="js/bootstrap.min.js"></script>
 
     <script src="js/hanabi.js"></script>
+    <!-- Include Scala.js compiled code -->
+    <script type="text/javascript" src="./target/scala-2.11/hanabi-web-fastopt.js"></script>
+    <!-- Run HanabiApp -->
+    <script type="text/javascript">
+        hanabi.web.HanabiApp().main();
+    </script>
 
     <div id="table">
         Table:
