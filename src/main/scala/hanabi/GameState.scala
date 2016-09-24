@@ -11,7 +11,7 @@ case class GameState(currentPlayer : Int,
                      deck          : Deck,
                      playersHands  : IndexedSeq[Hand],
                      table         : Map[Card.Color, Int],
-                     discard       : Seq[Card],
+                     discarded     : Seq[Card],
                      remainingHint : Int,
                      remainingLife : Int)
 {
@@ -47,7 +47,7 @@ case class GameState(currentPlayer : Int,
       copy(
         deck = newDeck,
         remainingLife = remainingLife - 1,
-        discard = played +: discard
+        discarded = played +: discarded
       )
 
     r.updateHand(hand + drawn).nextPlayer
@@ -58,7 +58,7 @@ case class GameState(currentPlayer : Int,
     val (drawn, newDeck) = deck.draw
     val r = copy(
       deck = newDeck,
-      discard = played +: discard,
+      discarded = played +: discarded,
       remainingHint = if (remainingHint < MAX_HINT) remainingHint + 1 else remainingHint
     )
     r.updateHand(hand + drawn).nextPlayer
@@ -74,7 +74,7 @@ object GameState {
       deck = deck,
       playersHands = hands.toIndexedSeq,
       table = Card.allColors.map((_,0)).toMap,
-      discard = Seq.empty,
+      discarded = Seq.empty,
       remainingHint = MAX_HINT,
       remainingLife = MAX_LIFE
     )
