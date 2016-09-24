@@ -4,7 +4,7 @@
     font-size: xx-large;
 }
 
-.card-red {
+.card-Red {
     /*background-color: #b92c28;
     #color: #f5f5f5;*/
     color: #fff;
@@ -12,25 +12,25 @@
     border-color: #d43f3a;
 }
 
-.card-blue {
+.card-Blue {
     color: #fff;
     background-color: #428bca;
     border-color: #428bca;
 }
 
-.card-green {
+.card-Green {
     color: #fff;
     background-color: #5cb85c;
     border-color: #4cae4c;
 }
 
-.card-white {
+.card-White {
     color: #333;
     background-color: #fff;
     border-color: #ccc;
 }
 
-.card-yellow {
+.card-Yellow {
     color: #333;
     background-color: #ffff33;
     border-color: lime;

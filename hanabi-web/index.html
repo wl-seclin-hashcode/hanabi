@@ -25,7 +25,6 @@
     <!-- Include all compiled plugins (below), or include individual files as needed -->
     <script src="js/bootstrap.min.js"></script>
 
-    <script src="js/hanabi.js"></script>
     <!-- Include Scala.js compiled code -->
     <script type="text/javascript" src="./target/scala-2.11/hanabi-web-fastopt.js"></script>
     <!-- Run HanabiApp -->
@@ -35,20 +34,19 @@
 
     <div id="table">
         Table:
-        <span class="card card-red">1</span>
-        <span class="card card-blue">&nbsp;</span>
-        <span class="card card-yellow">4</span>
-        <span class="card card-green">3</span>
-        <span class="card card-white">1</span>
+        <span class="card card-Red">1</span>
+        <span class="card card-Blue">&nbsp;</span>
+        <span class="card card-Yellow">4</span>
+        <span class="card card-Green">3</span>
+        <span class="card card-White">1</span>
     </div>
 
     <div id="tokens">
-        <div>Clues:
+        <div id="clues">Clues:
             <span class="clue"></span><span class="clue"></span><span class="clue"></span><span class="clue"></span>
             <span class="used-clue"></span><span class="used-clue"></span><span class="used-clue"></span><span class="used-clue"></span>
         </div>
-        <div>
-           Lifes:
+        <div id="lifes">Lifes:
             <span class="life"></span><span class="life"></span>
             <span class="used-life"></span>
         </div>
@@ -60,7 +58,6 @@
             <span class="card card-blue">3</span>
             <span class="card card-yellow">4</span>
             <span class="card card-green">3</span>
-            <span class="card card-white">1</span>
         </div>
         <div>
             Player 2:
@@ -68,7 +65,6 @@
             <span class="card card-blue">3</span>
             <span class="card card-yellow">4</span>
             <span class="card card-green">3</span>
-            <span class="card card-white">1</span>
         </div>
         <div>
             Player 3:
@@ -76,7 +72,6 @@
             <span class="card card-blue">3</span>
             <span class="card card-yellow">4</span>
             <span class="card card-green">3</span>
-            <span class="card card-white">1</span>
         </div>
     </div>
 
