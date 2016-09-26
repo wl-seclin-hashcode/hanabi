@@ -1,7 +1,25 @@
+body {
+    padding-left: 3em;
+}
+
+div {
+    padding-top: 0.7em;
+    padding-bottom: 0.7em;
+}
 .card {
+    position: relative;
+    box-sizing: content-box;
     font-family: monospace;
     border: thin solid;
     font-size: xx-large;
+    padding: 0.3em;
+}
+
+.card-back {
+    background-image: url("../img/fireworks-160971.svg");
+    background-size: cover;
+    z-index: -1;
+    background-color: #280a6a;
 }
 
 .card-Red {
@@ -39,7 +57,41 @@
 .clue {
     color: #428bca;
 }
+.used-clue {
+    opacity: 0.3;
+}
 
 .used-life {
     color: #d43f3a;
+}
+.life {
+    opacity: 0.3;
+}
+
+.action {
+    color: white;
+    opacity: 0.2;
+}
+.action:before {
+    position: absolute;
+    padding: 0.6em;
+    left: 0.04em;
+}
+
+.action:hover {
+    opacity: 0.8;
+}
+
+.trash:before {
+    bottom: -1.3em;
+}
+.play:before {
+    bottom:  0.5em;
+}
+
+#my-hand {
+    padding-top: 1em;
+}
+#discard {
+    padding-top: 3em;
 }

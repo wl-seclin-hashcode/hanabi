@@ -1,6 +1,6 @@
 package hanabi.web
 
-import hanabi.{GameState, Hand}
+import hanabi.{GameState, Hand, LevelHint, PlayCard}
 import org.scalajs.dom.Element
 import org.scalajs.jquery.jQuery
 
@@ -14,11 +14,14 @@ import scala.scalajs.js.JSApp
   */
 object HanabiApp extends JSApp {
 
-  def initUI = updateUI(GameState.initial(4))
+  def initUI = updateUI(GameState.initial(4)
+    .play(PlayCard(0))
+    .play(LevelHint(0,1))
+  )
 
   def updateUI(state: GameState) = {
     jQuery("#clues span").attr("class", (i: Int) ⇒ if (i < state.remainingHint) "clue" else "used-clue")
-    jQuery("#lifes span").attr("class", (i: Int) ⇒ if (i < state.remainingLife) "life" else "used-life")
+    jQuery("#lifes span").attr("class", (i: Int) ⇒ if (i < hanabi.MAX_LIFE - state.remainingLife) "used-life" else "life")
     jQuery("#hands div").each((i:Int, elem: Element) ⇒ updateHand(state.playersHands(i), elem))
     for { (color, level) ← state.table }
       jQuery(s"#table .card-$color").html(if (level==0) "&nbsp;" else level.toString)
@@ -32,8 +35,8 @@ object HanabiApp extends JSApp {
   }
 
   def addUiClasses() = {
-    jQuery(".clue").addClass("glyphicon glyphicon-info-sign")
-    jQuery(".used-life").addClass("glyphicon glyphicon-remove-sign")
+    jQuery(".clue, .used-clue").addClass("glyphicon glyphicon-info-sign")
+    jQuery(".life, .used-life").addClass("glyphicon glyphicon-remove-sign")
   }
 
   override def main() = {
