@@ -12,16 +12,17 @@ import Card._
 
 @RunWith(classOf[JUnitRunner])
 class GameStateSpec extends FlatSpec with Matchers with MockitoSugar with OneInstancePerTest with BeforeAndAfter {
+  import SimpleRules._
   val game = GameState.initial(4)
 
   val stacked = {
     val numPlayer = 3
     val handSize = 5
-    val (hands, deck) = Deck(Card.allCards.reverse).deal(numPlayer, handSize)
+    val (hands, deck) = Deck(allCards.reverse).deal(numPlayer, handSize)
     GameState(currentPlayer = 0,
       deck = deck,
       playersHands = hands.toIndexedSeq,
-      table = Card.allColors.map((_, 0)).toMap,
+      table = allColors.map((_, 0)).toMap,
       discarded = Seq.empty,
       remainingHint = MAX_HINT,
       remainingLife = MAX_LIFE)

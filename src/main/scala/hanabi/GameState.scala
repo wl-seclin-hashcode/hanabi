@@ -10,7 +10,7 @@ package hanabi
 case class GameState(currentPlayer: Int,
                      deck: Deck,
                      playersHands: IndexedSeq[Hand],
-                     table: Map[Card.Color, Int],
+                     table: Map[Color, Int],
                      discarded: Seq[Card],
                      remainingHint: Int,
                      remainingLife: Int) {
@@ -69,13 +69,13 @@ case class GameState(currentPlayer: Int,
 }
 
 object GameState {
-  def initial(numPlayer: Int) = {
+  def initial(numPlayer: Int, rules: HanabiRules = SimpleRules) = {
     val handSize = if (numPlayer <= 3) 5 else 4
-    val (hands, deck) = Deck.shuffle(Card.allCards).deal(numPlayer, handSize)
+    val (hands, deck) = Deck.shuffle(rules.allCards).deal(numPlayer, handSize)
     GameState(currentPlayer = 0,
       deck = deck,
       playersHands = hands.toIndexedSeq,
-      table = Card.allColors.map((_, 0)).toMap,
+      table = rules.allColors.map((_, 0)).toMap,
       discarded = Seq.empty,
       remainingHint = MAX_HINT,
       remainingLife = MAX_LIFE)

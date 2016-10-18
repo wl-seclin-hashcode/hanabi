@@ -13,6 +13,7 @@ import hanabi.ai._
 
 @RunWith(classOf[JUnitRunner])
 class DeckSpec extends FlatSpec with Matchers with MockitoSugar with OneInstancePerTest with BeforeAndAfter {
+  import SimpleRules._
 
   def stack(cards: Seq[Card]): GameState = {
     val numPlayer = 3
@@ -21,17 +22,17 @@ class DeckSpec extends FlatSpec with Matchers with MockitoSugar with OneInstance
     GameState(currentPlayer = 0,
       deck = deck,
       playersHands = hands.toIndexedSeq,
-      table = Card.allColors.map((_, 0)).toMap,
+      table = allColors.map((_, 0)).toMap,
       discarded = Seq.empty,
       remainingHint = MAX_HINT,
       remainingLife = MAX_LIFE)
   }
 
-  val orderedStack = stack(Card.allCards)
-  val reverseStacked = stack(Card.allCards.reverse)
+  val orderedStack = stack(allCards)
+  val reverseStacked = stack(allCards.reverse)
 
   "a Deck" should "distribute cards one by one" in {
-    val (h, rest) = Deck(Card.allCards.distinct).deal(hands = 5, cardsPerHand = 5)
+    val (h, rest) = Deck(allCards.distinct).deal(hands = 5, cardsPerHand = 5)
     val hnds = h.toVector
     def expected(lvl: Int) = allColors.map(c => Card(lvl, c)).toVector
     for {
@@ -39,8 +40,8 @@ class DeckSpec extends FlatSpec with Matchers with MockitoSugar with OneInstance
       (c, i) <- hnds(h).cards.zipWithIndex
     } c.level should be(i + 1)
   }
-  
-//  it should "allow to try to draw from an empty deck an return unchanged deck" in {
-//  }
+
+  //  it should "allow to try to draw from an empty deck an return unchanged deck" in {
+  //  }
 
 }

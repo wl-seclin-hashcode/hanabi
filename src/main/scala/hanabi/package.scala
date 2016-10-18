@@ -10,21 +10,14 @@ package object hanabi {
   val MAX_HINT = 8
   val MAX_LIFE = 3
 
-  object Card {
-    trait Color
-    case object Yellow extends Color
-    case object Blue extends Color
-    case object Green extends Color
-    case object Red extends Color
-    case object White extends Color
-    val allColors = Set(Yellow, Blue, Green, Red, White)
-    val allCards = for {
-      level <- Seq(1, 1, 1, 2, 2, 3, 3, 4, 4, 5)
-      color <- allColors
-    } yield Card(level, color)
-  }
+  trait Color
+  case object Yellow extends Color
+  case object Blue extends Color
+  case object Green extends Color
+  case object Red extends Color
+  case object White extends Color
 
-  case class Card(level: Int, color: Card.Color)
+  case class Card(level: Int, color: Color)
 
   object Deck {
     def shuffle(allCards: Seq[Card]) = Deck(allCards).shuffle
@@ -60,8 +53,23 @@ package object hanabi {
   }
 
   trait Move
-  case class ColorHint(playerId: Int, color: Card.Color) extends Move
+  case class ColorHint(playerId: Int, color: Color) extends Move
   case class LevelHint(playerId: Int, level: Int) extends Move
   case class PlayCard(cardPos: Int) extends Move
   case class Discard(cardPos: Int) extends Move
+
+  trait HanabiRules {
+    def allowedColorHints: Set[Color]
+    def allCards: Seq[Card]
+    lazy val allColors: Set[Color] = allCards.map(_.color).toSet
+  }
+
+  case object SimpleRules extends HanabiRules {
+    val allowedColorHints: Set[Color] = Set(Yellow, Blue, Green, Red, White)
+    val allCards: Seq[Card] = for {
+      level <- Seq(1, 1, 1, 2, 2, 3, 3, 4, 4, 5)
+      color <- Set(Yellow, Blue, Green, Red, White)
+    } yield Card(level, color)
+
+  }
 }
