@@ -28,11 +28,16 @@ class GameStateSpec extends FlatSpec with Matchers with MockitoSugar with OneIns
   }
 
   "game state" should "initialize properly" in {
-    for (hand <- GameState.initial(3).playersHands) hand.cards should have size 5
-    for (hand <- game.playersHands) hand.cards should have size 4
-    game.remainingHint should be(8)
-    game.remainingLife should be(3)
-    game.lost should be(false)
+    def check(plCount: Int) = {
+      val g=GameState.initial(plCount)
+      for (hand <- g.playersHands) hand.cards should have size (if (plCount <= 3) 5 else 4)
+      g.remainingHint should be(8)
+      g.remainingLife should be(3)
+      g.lost should be(false)
+      g.playersHands should have size plCount
+    }
+
+    for { plCount <- 2 to 5 } check(plCount)
   }
 
   it should "count clues" in {

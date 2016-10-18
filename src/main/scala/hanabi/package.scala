@@ -1,11 +1,11 @@
 import scala.util.Random
 
 /**
-  * Created with IntelliJ IDEA.
-  * User: a203673
-  * Date: 20/09/16
-  * Time: 15:13
-  */
+ * Created with IntelliJ IDEA.
+ * User: a203673
+ * Date: 20/09/16
+ * Time: 15:13
+ */
 package object hanabi {
   val MAX_HINT = 8
   val MAX_LIFE = 3
@@ -34,18 +34,12 @@ package object hanabi {
     def isEmpty = cards.isEmpty
     def nonEmpty = cards.nonEmpty
     def draw = (cards.head, Deck(cards.tail))
-    def deal(hands: Int, cardsPerHand: Int) =
-      (for {
-        player <- 0 until hands
-      }
-      yield {
-        Hand(for {
-          indexCard <- 0 until cardsPerHand
-        }
-        yield {
-          cards(hands * indexCard + player)
-        })
-      },Deck(cards.drop(cardsPerHand*hands)))
+
+    def deal(hands: Int, cardsPerHand: Int): (Seq[Hand], Deck) =
+      (Seq.tabulate(hands) { h =>
+        Hand(Vector.tabulate(cardsPerHand) { i => cards(hands * i + h) })
+      }, Deck(cards.drop(cardsPerHand * hands)))
+
     def shuffle = Deck(Random.shuffle(cards))
   }
 
@@ -58,7 +52,7 @@ package object hanabi {
       val (x, y) = cards.splitAt(pos)
       Hand(x ++ (c +: y))
     }
-    def +(c:Card) = Hand(cards :+ c)
+    def +(c: Card) = Hand(cards :+ c)
   }
 
   trait Player {

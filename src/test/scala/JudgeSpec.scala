@@ -14,9 +14,7 @@ import hanabi.ai._
 @RunWith(classOf[JUnitRunner])
 class JudgeSpec extends FlatSpec with Matchers with MockitoSugar with OneInstancePerTest with BeforeAndAfter {
 
-  def stack(cards: Seq[Card]): GameState = {
-    val numPlayer = 3
-    val handSize = 5
+  def stack(cards: Seq[Card], numPlayer: Int, handSize: Int): GameState = {
     val (hands, deck) = Deck(cards).deal(numPlayer, handSize)
     GameState(currentPlayer = 0,
       deck = deck,
@@ -27,14 +25,14 @@ class JudgeSpec extends FlatSpec with Matchers with MockitoSugar with OneInstanc
       remainingLife = MAX_LIFE)
   }
 
-  val orderedStack = stack(Card.allCards)
-  val reverseStacked = stack(Card.allCards.reverse)
-  val distinctStacked = stack(Card.allCards.distinct ++ Card.allCards)
-
   "the Judge" should "handle dummy players who play in order" in {
-    //TODO : does not work with 2 players
     for (count <- 2 to 5) {
+      val size = if (count <= 3) 5 else 4
+      val orderedStack = stack(Card.allCards, count, size)
+      val reverseStacked = stack(Card.allCards.reverse, count, size)
+      val distinctStacked = stack(Card.allCards.distinct ++ Card.allCards, count, size)
       val players = Vector.fill(count)(DummyPlayer)
+      Judge(players, orderedStack).state.playersHands.size should be(count)
       Judge(players, orderedStack).playToTheEnd.score should not be 0
       Judge(players, reverseStacked).playToTheEnd.score shouldBe 0
       Judge(players, distinctStacked).playToTheEnd.score shouldBe 25
