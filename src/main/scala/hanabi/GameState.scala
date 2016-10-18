@@ -7,30 +7,33 @@ package hanabi
  * Time: 21:57
  */
 
-case class GameState(currentPlayer : Int,
-                     deck          : Deck,
-                     playersHands  : IndexedSeq[Hand],
-                     table         : Map[Card.Color, Int],
-                     discarded     : Seq[Card],
-                     remainingHint : Int,
-                     remainingLife : Int)
-{
+case class GameState(currentPlayer: Int,
+                     deck: Deck,
+                     playersHands: IndexedSeq[Hand],
+                     table: Map[Card.Color, Int],
+                     discarded: Seq[Card],
+                     remainingHint: Int,
+                     remainingLife: Int) {
   def numPlayer = playersHands.size
   def activeHand = playersHands(currentPlayer)
 
+  val lost = remainingLife == 0
+
   def play(move: Move) = move match {
-    case _ : LevelHint | _ : ColorHint ⇒ hint
-    case PlayCard(cardPos)             ⇒ playCard(cardPos)
-    case Discard(cardPos)              ⇒ discard(cardPos)
+    case _: LevelHint | _: ColorHint ⇒ hint
+    case PlayCard(cardPos)           ⇒ playCard(cardPos)
+    case Discard(cardPos)            ⇒ discard(cardPos)
   }
 
+  def score = table.values.sum
+  
   private def nextPlayer: GameState = copy(currentPlayer = (currentPlayer + 1) % numPlayer)
 
   private def updateHand(newHand: Hand): GameState = copy(playersHands = playersHands.updated(currentPlayer, newHand))
 
   private def hint = {
     require(remainingHint > 0)
-    copy(remainingHint = remainingHint -1).nextPlayer
+    copy(remainingHint = remainingHint - 1).nextPlayer
   }
 
   private def playCard(pos: Int) = {
@@ -41,14 +44,12 @@ case class GameState(currentPlayer : Int,
       copy(
         table = table.updated(played.color, played.level),
         deck = newDeck,
-        remainingHint = if (played.level == 5 && remainingHint < MAX_HINT) remainingHint + 1 else remainingHint
-      )
+        remainingHint = if (played.level == 5 && remainingHint < MAX_HINT) remainingHint + 1 else remainingHint)
     else
       copy(
         deck = newDeck,
         remainingLife = remainingLife - 1,
-        discarded = played +: discarded
-      )
+        discarded = played +: discarded)
 
     r.updateHand(hand + drawn).nextPlayer
   }
@@ -59,8 +60,7 @@ case class GameState(currentPlayer : Int,
     val r = copy(
       deck = newDeck,
       discarded = played +: discarded,
-      remainingHint = if (remainingHint < MAX_HINT) remainingHint + 1 else remainingHint
-    )
+      remainingHint = if (remainingHint < MAX_HINT) remainingHint + 1 else remainingHint)
     r.updateHand(hand + drawn).nextPlayer
   }
 
@@ -70,13 +70,12 @@ object GameState {
   def initial(numPlayer: Int) = {
     val handSize = if (numPlayer <= 3) 5 else 4
     val (hands, deck) = Deck.shuffle(Card.allCards).deal(numPlayer, handSize)
-    GameState( currentPlayer = 0,
+    GameState(currentPlayer = 0,
       deck = deck,
       playersHands = hands.toIndexedSeq,
-      table = Card.allColors.map((_,0)).toMap,
+      table = Card.allColors.map((_, 0)).toMap,
       discarded = Seq.empty,
       remainingHint = MAX_HINT,
-      remainingLife = MAX_LIFE
-    )
+      remainingLife = MAX_LIFE)
   }
 }
