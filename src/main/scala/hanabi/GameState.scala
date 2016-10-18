@@ -57,6 +57,7 @@ case class GameState(currentPlayer: Int,
   }
 
   private def discard(pos: Int) = {
+    require(remainingHint < MAX_HINT)
     val (played, hand) = activeHand.play(pos)
     val (drawn, newDeck) = deck.draw
     val r = copy(

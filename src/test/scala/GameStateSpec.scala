@@ -46,6 +46,10 @@ class GameStateSpec extends FlatSpec with Matchers with MockitoSugar with OneIns
     clued.remainingHint should be(7)
     clued.play(LevelHint(0, 3)).remainingHint should be(6)
   }
+  
+  it should "not allow to discard at 8 clues" in {
+    an [Exception] should be thrownBy game.play(Discard(0))
+  }
 
   it should "stop after three mistakes" in {
     stacked.play(PlayCard(0)).play(PlayCard(0)).play(PlayCard(0)).lost should be(true)
