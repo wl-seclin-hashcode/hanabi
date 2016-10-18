@@ -8,6 +8,14 @@ package hanabi
  */
 object Judge {
   def start(players: IndexedSeq[Player]) = Judge(players, GameState.initial(players.size))
+
+  def avgScore(ai: Player, repeats: Int, playerCount: Int) = {
+    val results = for {
+      r <- 0 until repeats
+      end = Judge.start(Vector.fill(playerCount)(ai)).playToTheEnd
+    } yield end.score
+    results.sum.toDouble / repeats
+  }
 }
 
 case class Judge(players: IndexedSeq[Player], state: GameState) {
@@ -16,7 +24,7 @@ case class Judge(players: IndexedSeq[Player], state: GameState) {
     copy(state = state.play(move))
   }
 
-  def playToTheEnd:GameState =
+  def playToTheEnd: GameState =
     if (state.finished) state else nextState.playToTheEnd
 
 }

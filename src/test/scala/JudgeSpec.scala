@@ -39,4 +39,12 @@ class JudgeSpec extends FlatSpec with Matchers with MockitoSugar with OneInstanc
     }
   }
 
+  it should "give a positive score to dummy player" in {
+    for (playerCount <- 2 to 5) {
+      val score = Judge.avgScore(DummyPlayer, 100, playerCount)
+      println(s"avg score for $playerCount dummies : $score")
+      score should be > 0.1
+    }
+  }
+
 }
