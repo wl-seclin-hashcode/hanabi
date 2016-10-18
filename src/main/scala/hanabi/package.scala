@@ -26,7 +26,7 @@ package object hanabi {
   case class Deck(cards: Seq[Card]) {
     def isEmpty = cards.isEmpty
     def nonEmpty = cards.nonEmpty
-    def draw = (cards.head, Deck(cards.tail))
+    def draw: (Option[Card], Deck) = (cards.headOption, Deck(cards.drop(1)))
 
     def deal(hands: Int, cardsPerHand: Int): (Seq[Hand], Deck) =
       (Seq.tabulate(hands) { h =>
@@ -46,6 +46,7 @@ package object hanabi {
       Hand(x ++ (c +: y))
     }
     def +(c: Card) = Hand(cards :+ c)
+    def +(c: Option[Card]) = Hand(cards ++ c)
   }
 
   trait Player {

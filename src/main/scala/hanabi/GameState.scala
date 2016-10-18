@@ -13,23 +13,38 @@ case class GameState(currentPlayer: Int,
                      table: Map[Color, Int],
                      discarded: Seq[Card],
                      remainingHint: Int,
-                     remainingLife: Int) {
+                     remainingLife: Int,
+                     turnsLeft: Option[Int] = None) {
   def numPlayer = playersHands.size
   def activeHand = playersHands(currentPlayer)
 
-  val lost = remainingLife == 0
-  val won = score == 25
-  val finished = won || lost
+  def lost = remainingLife == 0
+  def won = score == 25
+  def finished = won || lost || turnsLeft == Some(0)
 
-  def play(move: Move) = move match {
-    case _: LevelHint | _: ColorHint ⇒ hint
-    case PlayCard(cardPos)           ⇒ playCard(cardPos)
-    case Discard(cardPos)            ⇒ discard(cardPos)
-  }
+  def play(move: Move) = {
+    move match {
+      case _: LevelHint | _: ColorHint => hint
+      case PlayCard(cardPos)           ⇒ playCard(cardPos)
+      case Discard(cardPos)            ⇒ discard(cardPos)
+    }
+  }.decrTurnsLeft
+
+  private def decrTurnsLeft = copy(turnsLeft = turnsLeft.map(_ - 1))
 
   def score = table.values.sum
 
   private def nextPlayer: GameState = copy(currentPlayer = (currentPlayer + 1) % numPlayer)
+
+  private def updateDraw(hand: Hand): GameState = {
+    val (drawn, newDeck) = deck.draw
+    updateHand(hand + drawn).copy(deck = newDeck).checkTurnsLeft
+  }
+
+  private def checkTurnsLeft =
+    if (deck.isEmpty)
+      copy(turnsLeft = turnsLeft orElse Some(playersHands.size + 1))
+    else this
 
   private def updateHand(newHand: Hand): GameState = copy(playersHands = playersHands.updated(currentPlayer, newHand))
 
@@ -40,31 +55,26 @@ case class GameState(currentPlayer: Int,
 
   private def playCard(pos: Int) = {
     val (played, hand) = activeHand.play(pos)
-    val (drawn, newDeck) = deck.draw
     val success = played.level == table(played.color) + 1
     val r = if (success)
       copy(
         table = table.updated(played.color, played.level),
-        deck = newDeck,
         remainingHint = if (played.level == 5 && remainingHint < MAX_HINT) remainingHint + 1 else remainingHint)
     else
       copy(
-        deck = newDeck,
         remainingLife = remainingLife - 1,
         discarded = played +: discarded)
 
-    r.updateHand(hand + drawn).nextPlayer
+    r.updateDraw(hand).nextPlayer
   }
 
   private def discard(pos: Int) = {
     require(remainingHint < MAX_HINT)
     val (played, hand) = activeHand.play(pos)
-    val (drawn, newDeck) = deck.draw
     val r = copy(
-      deck = newDeck,
       discarded = played +: discarded,
       remainingHint = if (remainingHint < MAX_HINT) remainingHint + 1 else remainingHint)
-    r.updateHand(hand + drawn).nextPlayer
+    r.updateDraw(hand).nextPlayer
   }
 
 }

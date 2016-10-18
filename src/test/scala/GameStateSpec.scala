@@ -30,7 +30,7 @@ class GameStateSpec extends FlatSpec with Matchers with MockitoSugar with OneIns
 
   "game state" should "initialize properly" in {
     def check(plCount: Int) = {
-      val g=GameState.initial(plCount)
+      val g = GameState.initial(plCount)
       for (hand <- g.playersHands) hand.cards should have size (if (plCount <= 3) 5 else 4)
       g.remainingHint should be(8)
       g.remainingLife should be(3)
@@ -46,13 +46,31 @@ class GameStateSpec extends FlatSpec with Matchers with MockitoSugar with OneIns
     clued.remainingHint should be(7)
     clued.play(LevelHint(0, 3)).remainingHint should be(6)
   }
-  
+
   it should "not allow to discard at 8 clues" in {
-    an [Exception] should be thrownBy game.play(Discard(0))
+    an[Exception] should be thrownBy game.play(Discard(0))
   }
 
   it should "stop after three mistakes" in {
     stacked.play(PlayCard(0)).play(PlayCard(0)).play(PlayCard(0)).lost should be(true)
+  }
+
+  it should "stop one round after last card drawn" in {
+    var g = game
+    while (g.deck.cards.nonEmpty) {
+      g = g.play(ColorHint(0, Blue))
+      g = g.play(Discard(0))
+      g.finished should be(false)
+    }
+    // last card drawn
+    g.turnsLeft should be(Some(g.playersHands.size))
+    for (i <- 1 until g.playersHands.size) {
+      g = g.play(ColorHint(0, Blue))
+      g.finished should be(false)
+    }
+    // last turn
+    g = g.play(Discard(0))
+    g.finished should be(true)
   }
 
 }
