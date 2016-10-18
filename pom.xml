@@ -29,6 +29,24 @@
 			<version>0.6.12</version>
 			<scope>test</scope>
 		</dependency>
+		<dependency>
+			<groupId>org.scalatest</groupId>
+			<artifactId>scalatest_2.11</artifactId>
+			<version>2.2.2</version>
+			<scope>test</scope>
+		</dependency>
+		<dependency>
+			<groupId>org.powermock</groupId>
+			<artifactId>powermock-api-mockito</artifactId>
+			<version>1.5.5</version>
+			<scope>test</scope>
+		</dependency>
+		<dependency>
+			<artifactId>junit</artifactId>
+			<groupId>junit</groupId>
+			<version>4.10</version>
+			<scope>test</scope>
+		</dependency>
 	</dependencies>
 	<build>
 		<sourceDirectory>src/main/scala</sourceDirectory>
