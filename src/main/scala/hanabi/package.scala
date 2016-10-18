@@ -35,8 +35,17 @@ package object hanabi {
     def nonEmpty = cards.nonEmpty
     def draw = (cards.head, Deck(cards.tail))
     def deal(hands: Int, cardsPerHand: Int) =
-      (cards.grouped(cardsPerHand).take(hands).map(cards => Hand(cards.toIndexedSeq)),
-        Deck(cards.drop(cardsPerHand*hands)))
+      (for {
+        player <- 0 until hands
+      }
+      yield {
+        Hand(for {
+          indexCard <- 0 until cardsPerHand
+        }
+        yield {
+          cards(hands * indexCard + player)
+        })
+      },Deck(cards.drop(cardsPerHand*hands)))
     def shuffle = Deck(Random.shuffle(cards))
   }
 
