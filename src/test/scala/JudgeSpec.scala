@@ -26,14 +26,19 @@ class JudgeSpec extends FlatSpec with Matchers with MockitoSugar with OneInstanc
       remainingHint = MAX_HINT,
       remainingLife = MAX_LIFE)
   }
-  
+
   val orderedStack = stack(Card.allCards)
   val reverseStacked = stack(Card.allCards.reverse)
+  val distinctStacked = stack(Card.allCards.distinct ++ Card.allCards)
 
   "the Judge" should "handle dummy players who play in order" in {
-    val players = Vector.fill(5)(DummyPlayer)
-    Judge(players, orderedStack).playToTheEnd.score should not be 0
-    Judge(players, reverseStacked).playToTheEnd.score shouldBe 0
+    //TODO : does not work with 2 players
+    for (count <- 2 to 5) {
+      val players = Vector.fill(count)(DummyPlayer)
+      Judge(players, orderedStack).playToTheEnd.score should not be 0
+      Judge(players, reverseStacked).playToTheEnd.score shouldBe 0
+      Judge(players, distinctStacked).playToTheEnd.score shouldBe 25
+    }
   }
 
 }

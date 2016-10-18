@@ -38,7 +38,9 @@ class DeckSpec extends FlatSpec with Matchers with MockitoSugar with OneInstance
       h <- 0 until 5
       (c, i) <- hnds(h).cards.zipWithIndex
     } c.level should be(i + 1)
-
   }
+  
+//  it should "allow to try to draw from an empty deck an return unchanged deck" in {
+//  }
 
 }

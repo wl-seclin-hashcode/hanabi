@@ -17,6 +17,6 @@ case class Judge(players: IndexedSeq[Player], state: GameState) {
   }
 
   def playToTheEnd:GameState =
-    if (state.lost) state else nextState.playToTheEnd
+    if (state.finished) state else nextState.playToTheEnd
 
 }

@@ -18,6 +18,8 @@ case class GameState(currentPlayer: Int,
   def activeHand = playersHands(currentPlayer)
 
   val lost = remainingLife == 0
+  val won = score == 25
+  val finished = won || lost
 
   def play(move: Move) = move match {
     case _: LevelHint | _: ColorHint ⇒ hint
@@ -26,7 +28,7 @@ case class GameState(currentPlayer: Int,
   }
 
   def score = table.values.sum
-  
+
   private def nextPlayer: GameState = copy(currentPlayer = (currentPlayer + 1) % numPlayer)
 
   private def updateHand(newHand: Hand): GameState = copy(playersHands = playersHands.updated(currentPlayer, newHand))
