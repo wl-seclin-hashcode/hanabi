@@ -48,4 +48,12 @@ class JudgeSpec extends FlatSpec with Matchers with MockitoSugar with OneInstanc
     }
   }
 
+  it should "give a perfect score to cheater player" in {
+    for (playerCount <- 2 to 5) {
+      val score = Judge.avgScore(CheaterPlayer, 10, playerCount)
+      println(s"avg score for $playerCount cheaters : $score")
+      score should be > 23.0
+    }
+  }
+
 }

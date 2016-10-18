@@ -14,6 +14,7 @@ case class GameState(currentPlayer: Int,
                      discarded: Seq[Card],
                      remainingHint: Int,
                      remainingLife: Int,
+                     rules: HanabiRules = SimpleRules,
                      turnsLeft: Option[Int] = None) {
   def numPlayer = playersHands.size
   def activeHand = playersHands(currentPlayer)
@@ -34,6 +35,13 @@ case class GameState(currentPlayer: Int,
 
   def score = table.values.sum
 
+  def isPlayable(c: Card) = {
+    table.get(c.color) match {
+      case Some(lvl) if lvl == c.level - 1 => true
+      case _                               => false
+    }
+  }
+
   private def nextPlayer: GameState = copy(currentPlayer = (currentPlayer + 1) % numPlayer)
 
   private def updateDraw(hand: Hand): GameState = {
@@ -49,7 +57,7 @@ case class GameState(currentPlayer: Int,
   private def updateHand(newHand: Hand): GameState = copy(playersHands = playersHands.updated(currentPlayer, newHand))
 
   private def hint = {
-    require(remainingHint > 0)
+    require(canHint)
     copy(remainingHint = remainingHint - 1).nextPlayer
   }
 
@@ -68,8 +76,11 @@ case class GameState(currentPlayer: Int,
     r.updateDraw(hand).nextPlayer
   }
 
+  def canDiscard = remainingHint < MAX_HINT
+  def canHint = remainingHint > 0
+
   private def discard(pos: Int) = {
-    require(remainingHint < MAX_HINT)
+    require(canDiscard)
     val (played, hand) = activeHand.play(pos)
     val r = copy(
       discarded = played +: discarded,
@@ -77,6 +88,15 @@ case class GameState(currentPlayer: Int,
     r.updateDraw(hand).nextPlayer
   }
 
+  def isUseless(c: Card) = table.getOrElse(c.color, 0) >= c.level
+  def isKey(c: Card) = c.level == 5 || discarded.contains(c)
+
+  def debugString = s"""
+    | hands : ${playersHands.map(_.cards.map(_.debugString))}
+    | discard : ${discarded.map(_.debugString)}
+    | in play : $table
+    | $remainingHint hints, $remainingLife lifes
+    """.stripMargin
 }
 
 object GameState {

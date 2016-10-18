@@ -17,7 +17,12 @@ package object hanabi {
   case object Red extends Color
   case object White extends Color
 
-  case class Card(level: Int, color: Color)
+  case class Card(level: Int, color: Color) {
+    def debugString={
+      val c=color.toString.head
+      s"$level$c"
+    }
+  }
 
   object Deck {
     def shuffle(allCards: Seq[Card]) = Deck(allCards).shuffle
