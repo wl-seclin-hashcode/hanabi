@@ -1,5 +1,7 @@
 package hanabi
 
+import hanabi.state._
+
 /**
  * Created with IntelliJ IDEA.
  * User: a203673

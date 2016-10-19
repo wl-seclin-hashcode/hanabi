@@ -1,4 +1,6 @@
-package hanabi
+package hanabi.state
+
+import hanabi._
 
 /**
  * Created with IntelliJ IDEA.
@@ -9,15 +11,16 @@ package hanabi
 
 case class GameState(currentPlayer: Int,
                      deck: Deck,
-                     playersHands: IndexedSeq[Hand],
+                     private[state] val playersHands: IndexedSeq[Hand],
                      table: Map[Color, Int],
                      discarded: Seq[Card],
                      remainingHint: Int,
                      remainingLife: Int,
                      rules: HanabiRules = SimpleRules,
                      turnsLeft: Option[Int] = None) {
-  def numPlayer = playersHands.size
-  def activeHand = playersHands(currentPlayer)
+  
+  val numPlayer = playersHands.size
+  private[state] def activeHand = playersHands(currentPlayer)
 
   def lost = remainingLife == 0
   def won = score == 25

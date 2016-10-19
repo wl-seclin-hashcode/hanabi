@@ -1,4 +1,5 @@
 import scala.util.Random
+import hanabi.state._
 
 /**
  * Created with IntelliJ IDEA.

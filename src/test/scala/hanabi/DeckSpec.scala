@@ -1,6 +1,8 @@
+package hanabi
+
+import state._
 
 import org.scalatest.mock.MockitoSugar
-
 import org.scalatest.BeforeAndAfter
 import org.junit.runner.RunWith
 import org.scalatest.OneInstancePerTest
@@ -8,7 +10,7 @@ import org.scalatest.FlatSpec
 import org.scalatest.Matchers
 import org.scalatest.junit.JUnitRunner
 import hanabi._
-import Card._
+import hanabi.Card._
 import hanabi.ai._
 
 @RunWith(classOf[JUnitRunner])

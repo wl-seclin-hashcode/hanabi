@@ -1,3 +1,4 @@
+package hanabi.state
 
 import org.scalatest.mock.MockitoSugar
 
@@ -8,7 +9,6 @@ import org.scalatest.FlatSpec
 import org.scalatest.Matchers
 import org.scalatest.junit.JUnitRunner
 import hanabi._
-import Card._
 
 @RunWith(classOf[JUnitRunner])
 class GameStateSpec extends FlatSpec with Matchers with MockitoSugar with OneInstancePerTest with BeforeAndAfter {

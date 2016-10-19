@@ -1,3 +1,4 @@
+package hanabi
 
 import org.scalatest.mock.MockitoSugar
 
@@ -10,6 +11,7 @@ import org.scalatest.junit.JUnitRunner
 import hanabi._
 import Card._
 import hanabi.ai._
+import state._
 
 @RunWith(classOf[JUnitRunner])
 class JudgeSpec extends FlatSpec with Matchers with MockitoSugar with OneInstancePerTest with BeforeAndAfter {
@@ -33,7 +35,7 @@ class JudgeSpec extends FlatSpec with Matchers with MockitoSugar with OneInstanc
       val reverseStacked = stack(allCards.reverse, count, size)
       val distinctStacked = stack(allCards.distinct ++ allCards, count, size)
       val players = Vector.fill(count)(DummyPlayer)
-      Judge(players, orderedStack).state.playersHands.size should be(count)
+      Judge(players, orderedStack).state.numPlayer should be(count)
       Judge(players, orderedStack).playToTheEnd.score should not be 0
       Judge(players, reverseStacked).playToTheEnd.score shouldBe 0
       Judge(players, distinctStacked).playToTheEnd.score shouldBe 25
