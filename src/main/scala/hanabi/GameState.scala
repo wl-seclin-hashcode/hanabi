@@ -16,9 +16,10 @@ case class GameState(currentPlayer: Int,
                      discarded: Seq[Card],
                      remainingHint: Int,
                      remainingLife: Int,
+                     clues: Map[Int, Vector[Clue]] = Map.empty.withDefaultValue(Vector()),
                      rules: HanabiRules = SimpleRules,
                      turnsLeft: Option[Int] = None) {
-  
+
   val numPlayer = playersHands.size
   private[state] def activeHand = playersHands(currentPlayer)
 
@@ -28,9 +29,9 @@ case class GameState(currentPlayer: Int,
 
   def play(move: Move) = {
     move match {
-      case _: LevelHint | _: ColorHint => hint
-      case PlayCard(cardPos)           ⇒ playCard(cardPos)
-      case Discard(cardPos)            ⇒ discard(cardPos)
+      case h: Hint           => hint(h)
+      case PlayCard(cardPos) ⇒ playCard(cardPos)
+      case Discard(cardPos)  ⇒ discard(cardPos)
     }
   }.decrTurnsLeft
 
@@ -59,10 +60,34 @@ case class GameState(currentPlayer: Int,
 
   private def updateHand(newHand: Hand): GameState = copy(playersHands = playersHands.updated(currentPlayer, newHand))
 
-  private def hint = {
+  private def hint(move: Hint) = {
     require(canHint)
-    copy(remainingHint = remainingHint - 1).nextPlayer
+    val id = move.playerId
+    val newClues = clues.updated(id, clues(id) ++ hintToClues(move))
+    copy(
+      clues = newClues,
+      remainingHint = remainingHint - 1).nextPlayer
   }
+
+  private def hintToClues(h: Hint): Seq[Clue] = {
+    def matchesClue(c: Card) = h match {
+      case ColorHint(_, color) => c.color == color
+      case LevelHint(_, level) => c.level == level
+    }
+
+    def buildHint(pos: Int) = h match {
+      case ColorHint(_, color) => ColorClue(color, pos)
+      case LevelHint(_, level) => LevelClue(level, pos)
+    }
+
+    for {
+      (card, pos) <- playersHands(h.playerId).cards.zipWithIndex.toSeq
+      if matchesClue(card)
+    } yield buildHint(pos)
+  }
+
+  def cluesFor(player: Int): Vector[Clue] =
+    clues(player)
 
   private def playCard(pos: Int) = {
     val (played, hand) = activeHand.play(pos)

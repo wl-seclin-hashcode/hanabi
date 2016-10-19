@@ -73,4 +73,14 @@ class GameStateSpec extends FlatSpec with Matchers with MockitoSugar with OneIns
     g.finished should be(true)
   }
 
+  it should "keep given clues" in {
+    stacked.cluesFor(2) shouldBe empty
+    val clued = stacked.play(ColorHint(2, Blue))
+    clued.cluesFor(2) shouldBe (Vector(ColorClue(Blue, 2)))
+    clued.cluesFor(0) shouldBe empty
+
+    val again = clued.play(ColorHint(2, Red))
+    again.cluesFor(2) shouldBe (Vector(ColorClue(Blue, 2), ColorClue(Red, 0)))
+  }
+
 }

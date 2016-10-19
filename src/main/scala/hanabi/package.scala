@@ -19,8 +19,8 @@ package object hanabi {
   case object White extends Color
 
   case class Card(level: Int, color: Color) {
-    def debugString={
-      val c=color.toString.head
+    def debugString = {
+      val c = color.toString.head
       s"$level$c"
     }
   }
@@ -55,13 +55,23 @@ package object hanabi {
     def +(c: Option[Card]) = Hand(cards ++ c)
   }
 
+  // clues are used to record information given by hints
+  trait Clue {
+    val position: Int
+  }
+
+  case class ColorClue(color: Color, position: Int) extends Clue
+  case class LevelClue(level: Int, position: Int) extends Clue
+
   trait Player {
     def nextMove(state: GameState): Move
   }
 
   trait Move
-  case class ColorHint(playerId: Int, color: Color) extends Move
-  case class LevelHint(playerId: Int, level: Int) extends Move
+  //a Hint can be given to a player to notify him of position(s) of color or values. It can be given even if no cards match the hint.
+  trait Hint extends Move { val playerId: Int }
+  case class ColorHint(playerId: Int, color: Color) extends Hint
+  case class LevelHint(playerId: Int, level: Int) extends Hint
   case class PlayCard(cardPos: Int) extends Move
   case class Discard(cardPos: Int) extends Move
 
