@@ -2,12 +2,6 @@ package hanabi
 
 import hanabi.state._
 
-/**
- * Created with IntelliJ IDEA.
- * User: a203673
- * Date: 20/09/16
- * Time: 15:36
- */
 object Judge {
   def start(players: IndexedSeq[Player]) = Judge(players, GameState.initial(players.size))
 
@@ -23,10 +17,19 @@ object Judge {
 case class Judge(players: IndexedSeq[Player], state: GameState) {
   def nextState = {
     val move = players(state.currentPlayer).nextMove(state)
-    copy(state = state.play(move))
+    val next = state.play(move)
+    for {
+      p <- players
+      i <- next.lastInfo
+    } p.info(i)
+    copy(state = next)
   }
 
   def playToTheEnd: GameState =
     if (state.finished) state else nextState.playToTheEnd
 
 }
+
+trait Info
+case class Played(player: Int, pos: Int, card: Card, success: Boolean) extends Info
+case class Discarded(player: Int, pos: Int, card: Card) extends Info

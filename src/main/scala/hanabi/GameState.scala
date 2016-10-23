@@ -2,13 +2,6 @@ package hanabi.state
 
 import hanabi._
 
-/**
- * Created with IntelliJ IDEA.
- * User: a203673
- * Date: 05/09/14
- * Time: 21:57
- */
-
 case class GameState(currentPlayer: Int,
                      deck: Deck,
                      private[state] val playersHands: IndexedSeq[Hand],
@@ -18,7 +11,8 @@ case class GameState(currentPlayer: Int,
                      remainingLife: Int,
                      clues: Map[Int, Vector[Clue]] = Map.empty.withDefaultValue(Vector()),
                      rules: HanabiRules = SimpleRules,
-                     turnsLeft: Option[Int] = None) {
+                     turnsLeft: Option[Int] = None,
+                     lastInfo: Option[Info] = None) {
 
   val numPlayer = playersHands.size
   private[state] def activeHand = playersHands(currentPlayer)
@@ -101,7 +95,8 @@ case class GameState(currentPlayer: Int,
         remainingLife = remainingLife - 1,
         discarded = played +: discarded)
 
-    r.updateDraw(hand).nextPlayer
+    val info = Played(currentPlayer, pos, played, success)
+    r.updateDraw(hand).nextPlayer.copy(lastInfo = Some(info))
   }
 
   def canDiscard = remainingHint < MAX_HINT
@@ -109,10 +104,12 @@ case class GameState(currentPlayer: Int,
 
   private def discard(pos: Int) = {
     require(canDiscard)
-    val (played, hand) = activeHand.play(pos)
+    val (discardedCard, hand) = activeHand.play(pos)
+    val info = Discarded(currentPlayer, pos, discardedCard)
     val r = copy(
-      discarded = played +: discarded,
-      remainingHint = if (remainingHint < MAX_HINT) remainingHint + 1 else remainingHint)
+      discarded = discardedCard +: discarded,
+      remainingHint = if (remainingHint < MAX_HINT) remainingHint + 1 else remainingHint,
+      lastInfo = Some(info))
     r.updateDraw(hand).nextPlayer
   }
 

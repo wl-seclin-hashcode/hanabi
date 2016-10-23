@@ -65,6 +65,7 @@ package object hanabi {
 
   trait Player {
     def nextMove(state: GameState): Move
+    def info(action: Info): Unit = {}
   }
 
   trait Move
