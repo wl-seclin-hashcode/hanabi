@@ -9,24 +9,14 @@ import org.scalatest.FlatSpec
 import org.scalatest.Matchers
 import org.scalatest.junit.JUnitRunner
 import hanabi._
+import SimpleRules._
 
 @RunWith(classOf[JUnitRunner])
-class GameStateSpec extends FlatSpec with Matchers with MockitoSugar with OneInstancePerTest with BeforeAndAfter {
-  import SimpleRules._
-  val game = GameState.initial(4)
+class GameStateSpec extends FlatSpec
+    with Matchers with MockitoSugar with OneInstancePerTest with BeforeAndAfter
+    with StackedDeck {
 
-  val stacked = {
-    val numPlayer = 3
-    val handSize = 5
-    val (hands, deck) = Deck(allCards.reverse).deal(numPlayer, handSize)
-    GameState(currentPlayer = 0,
-      deck = deck,
-      playersHands = hands.toIndexedSeq,
-      table = allColors.map((_, 0)).toMap,
-      discarded = Seq.empty,
-      remainingHint = MAX_HINT,
-      remainingLife = MAX_LIFE)
-  }
+  val game = GameState.initial(4)
 
   "game state" should "initialize properly" in {
     def check(plCount: Int) = {
@@ -52,7 +42,7 @@ class GameStateSpec extends FlatSpec with Matchers with MockitoSugar with OneIns
   }
 
   it should "stop after three mistakes" in {
-    stacked.play(PlayCard(0)).play(PlayCard(0)).play(PlayCard(0)).lost should be(true)
+    reverseState.play(PlayCard(0)).play(PlayCard(0)).play(PlayCard(0)).lost should be(true)
   }
 
   it should "stop one round after last card drawn" in {
@@ -74,8 +64,8 @@ class GameStateSpec extends FlatSpec with Matchers with MockitoSugar with OneIns
   }
 
   it should "keep given clues" in {
-    stacked.cluesFor(2) shouldBe empty
-    val clued = stacked.play(ColorHint(2, Blue))
+    reverseState.cluesFor(2) shouldBe empty
+    val clued = reverseState.play(ColorHint(2, Blue))
     clued.cluesFor(2) shouldBe (Vector(ColorClue(Blue, 2)))
     clued.cluesFor(0) shouldBe empty
 
@@ -86,13 +76,12 @@ class GameStateSpec extends FlatSpec with Matchers with MockitoSugar with OneIns
   it should "list who sees which cards when no cards have been played or discarded" in {
     for {
       p <- 0 to 2
-    } stacked.seenBy(p) should have size 10
+    } trivialState(3, 5).seenBy(p) should have size 10
   }
-
-//  it should "list who sees which cards when cards have been played and discarded" in {
-//    for {
-//      p <- 0 to 2
-//    } stacked.seenBy(p) should have size 10
-//  }
+  //  it should "list who sees which cards when cards have been played and discarded" in {
+  //    for {
+  //      p <- 0 to 2
+  //    } stacked.seenBy(p) should have size 10
+  //  }
 
 }

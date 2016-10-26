@@ -12,26 +12,12 @@ import org.scalatest.junit.JUnitRunner
 import hanabi._
 import hanabi.Card._
 import hanabi.ai._
+import SimpleRules._
 
 @RunWith(classOf[JUnitRunner])
-class DeckSpec extends FlatSpec with Matchers with MockitoSugar with OneInstancePerTest with BeforeAndAfter {
-  import SimpleRules._
-
-  def stack(cards: Seq[Card]): GameState = {
-    val numPlayer = 3
-    val handSize = 5
-    val (hands, deck) = Deck(cards).deal(numPlayer, handSize)
-    GameState(currentPlayer = 0,
-      deck = deck,
-      playersHands = hands.toIndexedSeq,
-      table = allColors.map((_, 0)).toMap,
-      discarded = Seq.empty,
-      remainingHint = MAX_HINT,
-      remainingLife = MAX_LIFE)
-  }
-
-  val orderedStack = stack(allCards)
-  val reverseStacked = stack(allCards.reverse)
+class DeckSpec extends FlatSpec
+    with Matchers with MockitoSugar with OneInstancePerTest with BeforeAndAfter
+    with StackedDeck {
 
   "a Deck" should "distribute cards one by one" in {
     val (h, rest) = Deck(allCards.distinct).deal(hands = 5, cardsPerHand = 5)
