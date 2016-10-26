@@ -1,6 +1,7 @@
 package hanabi.state
 
 import hanabi._
+import hanabi.state.GameState
 
 object CheaterPlayer extends Player {
 
@@ -14,7 +15,7 @@ object CheaterPlayer extends Player {
         case _                           => Discard(myHand.size - 1)
       }
     myHand.find(c => state.isPlayable(c)) match {
-      case Some(c) => PlayCard(myHand.indexOf(c))
+      case Some(c) => Play(myHand.indexOf(c))
       case _       => discardOrHint
     }
   }

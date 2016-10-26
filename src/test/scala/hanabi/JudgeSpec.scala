@@ -15,6 +15,7 @@ import state._
 import org.mockito.Mockito._
 import org.mockito.Matchers._
 import SimpleRules._
+import hanabi.state.GameState
 
 @RunWith(classOf[JUnitRunner])
 class JudgeSpec extends FlatSpec

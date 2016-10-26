@@ -1,18 +1,22 @@
 package hanabi.state
 
 import hanabi._
+import scala.Vector
 
-case class GameState(currentPlayer: Int,
-                     deck: Deck,
-                     private[state] val playersHands: IndexedSeq[Hand],
-                     table: Map[Color, Int],
-                     discarded: Seq[Card],
-                     remainingHint: Int,
-                     remainingLife: Int,
-                     clues: Map[Int, Seq[Clue]] = Map.empty.withDefaultValue(Vector()),
-                     rules: HanabiRules = SimpleRules,
-                     turnsLeft: Option[Int] = None,
-                     lastInfo: Option[Info] = None) {
+case class GameState(
+    deck: Deck,
+    private[state] val playersHands: IndexedSeq[Hand],
+    currentPlayer: Int = 0,
+    table: Map[Color, Int] = Map.empty,
+    discarded: Seq[Card] = Seq.empty,
+    hints: Int = SimpleRules.MAX_HINTS,
+    lives: Int = SimpleRules.INITIAL_LIVES,
+    clues: Map[Int, Seq[Clue]] = Map.empty.withDefaultValue(Vector()),
+    rules: HanabiRules = SimpleRules,
+    turnsLeft: Option[Int] = None,
+    lastInfo: Option[Info] = None) {
+  
+  import rules._
 
   val numPlayer = playersHands.size
   private[state] def activeHand = playersHands(currentPlayer)
@@ -22,14 +26,14 @@ case class GameState(currentPlayer: Int,
     l <- 1 to max
   } yield Card(l, c)
 
-  def lost = remainingLife == 0
+  def lost = lives == 0
   def won = score == 25
   def finished = won || lost || turnsLeft == Some(0)
 
   def play(move: Move) = {
     move match {
       case h: Hint           => hint(h)
-      case PlayCard(cardPos) => playCard(cardPos)
+      case Play(cardPos) => playCard(cardPos)
       case Discard(cardPos)  => discard(cardPos)
     }
   }.decrTurnsLeft
@@ -53,7 +57,7 @@ case class GameState(currentPlayer: Int,
   }
 
   private def checkTurnsLeft =
-    if (deck.isEmpty)
+    if (deck.empty)
       copy(turnsLeft = turnsLeft orElse Some(playersHands.size + 1))
     else this
 
@@ -65,7 +69,7 @@ case class GameState(currentPlayer: Int,
     val newClues = hintToClues(move)
     copy(
       clues = clues + (id -> (clues(id) ++ newClues)),
-      remainingHint = remainingHint - 1,
+      hints = hints - 1,
       lastInfo = Some(Clued(player = id, clues = newClues))).nextPlayer
   }
 
@@ -95,18 +99,18 @@ case class GameState(currentPlayer: Int,
     val r = if (success)
       copy(
         table = table.updated(played.color, played.level),
-        remainingHint = if (played.level == 5 && remainingHint < MAX_HINT) remainingHint + 1 else remainingHint)
+        hints = if (played.level == 5 && hints < MAX_HINTS) hints + 1 else hints)
     else
       copy(
-        remainingLife = remainingLife - 1,
+        lives = lives - 1,
         discarded = played +: discarded)
 
     val info = Played(currentPlayer, pos, played, success)
     r.updateDraw(hand).nextPlayer.copy(lastInfo = Some(info))
   }
 
-  def canDiscard = remainingHint < MAX_HINT
-  def canHint = remainingHint > 0
+  def canDiscard = hints < MAX_HINTS
+  def canHint = hints > 0
 
   private def discard(pos: Int) = {
     require(canDiscard)
@@ -114,12 +118,13 @@ case class GameState(currentPlayer: Int,
     val info = Discarded(currentPlayer, pos, discardedCard)
     val r = copy(
       discarded = discardedCard +: discarded,
-      remainingHint = if (remainingHint < MAX_HINT) remainingHint + 1 else remainingHint,
+      hints = if (hints < MAX_HINTS) hints + 1 else hints,
       lastInfo = Some(info))
     r.updateDraw(hand).nextPlayer
   }
 
-  lazy val seenBy: Map[Int, Vector[Card]] = Map(
+  //must be hidden outside package to prevent cheats
+  private[state] lazy val seenBy: Map[Int, Vector[Card]] = Map(
     (for {
       p <- 0 until playersHands.size
       (before, after) = playersHands.splitAt(p)
@@ -134,7 +139,7 @@ case class GameState(currentPlayer: Int,
     | hands : ${playersHands.map(_.cards.map(_.debugString))}
     | discard : ${discarded.map(_.debugString)}
     | in play : $table
-    | $remainingHint hints, $remainingLife lifes
+    | $hints hints, $lives lifes
     """.stripMargin
 }
 
@@ -145,9 +150,6 @@ object GameState {
     GameState(currentPlayer = 0,
       deck = deck,
       playersHands = hands.toIndexedSeq,
-      table = rules.allColors.map((_, 0)).toMap,
-      discarded = Seq.empty,
-      remainingHint = MAX_HINT,
-      remainingLife = MAX_LIFE)
+      table = rules.allColors.map((_, 0)).toMap)
   }
 }

@@ -2,6 +2,7 @@ package hanabi.ai
 
 import hanabi._
 import hanabi.state._
+import hanabi.state.GameState
 
 /**
  * Always plays his left-most card.
@@ -9,7 +10,7 @@ import hanabi.state._
 object DummyPlayer extends Player {
 
   def nextMove(state: GameState): Move = {
-    PlayCard(0)
+    Play(0)
   }
 
 }

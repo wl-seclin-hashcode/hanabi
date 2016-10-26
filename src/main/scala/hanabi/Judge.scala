@@ -1,6 +1,7 @@
 package hanabi
 
 import hanabi.state._
+import hanabi.state.GameState
 
 object Judge {
   def start(players: IndexedSeq[Player]) = Judge(players, GameState.initial(players.size))

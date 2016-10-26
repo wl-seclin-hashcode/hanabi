@@ -10,6 +10,7 @@ import org.scalatest.Matchers
 import org.scalatest.junit.JUnitRunner
 import hanabi._
 import SimpleRules._
+import hanabi.state.GameState
 
 @RunWith(classOf[JUnitRunner])
 class GameStateSpec extends FlatSpec
@@ -22,8 +23,8 @@ class GameStateSpec extends FlatSpec
     def check(plCount: Int) = {
       val g = GameState.initial(plCount)
       for (hand <- g.playersHands) hand.cards should have size (if (plCount <= 3) 5 else 4)
-      g.remainingHint should be(8)
-      g.remainingLife should be(3)
+      g.hints should be(8)
+      g.lives should be(3)
       g.lost should be(false)
       g.playersHands should have size plCount
     }
@@ -33,8 +34,8 @@ class GameStateSpec extends FlatSpec
 
   it should "count clues" in {
     val clued = game.play(ColorHint(0, Blue))
-    clued.remainingHint should be(7)
-    clued.play(LevelHint(0, 3)).remainingHint should be(6)
+    clued.hints should be(7)
+    clued.play(LevelHint(0, 3)).hints should be(6)
   }
 
   it should "not allow to discard at 8 clues" in {
@@ -42,7 +43,7 @@ class GameStateSpec extends FlatSpec
   }
 
   it should "stop after three mistakes" in {
-    reverseState.play(PlayCard(0)).play(PlayCard(0)).play(PlayCard(0)).lost should be(true)
+    reverseState.play(Play(0)).play(Play(0)).play(Play(0)).lost should be(true)
   }
 
   it should "stop one round after last card drawn" in {
@@ -80,21 +81,21 @@ class GameStateSpec extends FlatSpec
   }
 
   it should "list who sees which cards when cards have been played" in {
-    val plays = trivialState(3, 5).play(PlayCard(0)).play(PlayCard(0))
+    val plays = trivialState(3, 5).play(Play(0)).play(Play(0))
     for {
       p <- 0 to 2
     } plays.seenBy(p) should have size 12
   }
 
   it should "list who sees which cards when cards have been discarded" in {
-    val plays = trivialState(3, 5).copy(remainingHint = 3).play(Discard(0)).play(Discard(3)).play(Discard(2))
+    val plays = trivialState(3, 5).copy(hints = 3).play(Discard(0)).play(Discard(3)).play(Discard(2))
     for {
       p <- 0 to 2
     } plays.seenBy(p) should have size 13
   }
 
   it should "list who sees which cards when cards have been misplayed" in {
-    val plays = trivialState(3, 5).copy(remainingHint = 3).play(PlayCard(0)).play(PlayCard(3)).play(Discard(2))
+    val plays = trivialState(3, 5).copy(hints = 3).play(Play(0)).play(Play(3)).play(Discard(2))
     for {
       p <- 0 to 2
     } plays.seenBy(p) should have size 13
