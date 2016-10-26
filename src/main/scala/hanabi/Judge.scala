@@ -33,3 +33,4 @@ case class Judge(players: IndexedSeq[Player], state: GameState) {
 trait Info
 case class Played(player: Int, pos: Int, card: Card, success: Boolean) extends Info
 case class Discarded(player: Int, pos: Int, card: Card) extends Info
+case class Clued(player: Int, clues:Seq[Clue]) extends Info

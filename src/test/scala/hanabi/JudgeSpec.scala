@@ -89,4 +89,32 @@ class JudgeSpec extends FlatSpec with Matchers with MockitoSugar with OneInstanc
     }
   }
 
+  it should "notify players when a color clue is given" in {
+    val p0 = mock[Player]
+    val p1 = mock[Player]
+    val players = Vector(p0, p1)
+    val judge = Judge(players, stack(allCards, 2, 5))
+    when(p0.nextMove(any[GameState])).thenReturn(ColorHint(1, Blue))
+
+    judge.nextState
+    for (p <- players) {
+      verify(p).info(Clued(player = 1, clues = Seq(ColorClue(Blue, 3))))
+    }
+  }
+
+  it should "notify players when an index clue is given" in {
+    val p0 = mock[Player]
+    val p1 = mock[Player]
+    val players = Vector(p0, p1)
+    val judge = Judge(players, stack(allCards, 2, 5))
+    when(p0.nextMove(any[GameState])).thenReturn(LevelHint(playerId = 1, level = 1))
+
+    judge.nextState
+    for (p <- players) {
+      val positions = 0 to 4
+      val clues = positions.map(p => LevelClue(level = 1, position = p))
+      verify(p).info(Clued(player = 1, clues))
+    }
+  }
+
 }

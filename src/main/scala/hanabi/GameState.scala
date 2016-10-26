@@ -9,7 +9,7 @@ case class GameState(currentPlayer: Int,
                      discarded: Seq[Card],
                      remainingHint: Int,
                      remainingLife: Int,
-                     clues: Map[Int, Vector[Clue]] = Map.empty.withDefaultValue(Vector()),
+                     clues: Map[Int, Seq[Clue]] = Map.empty.withDefaultValue(Vector()),
                      rules: HanabiRules = SimpleRules,
                      turnsLeft: Option[Int] = None,
                      lastInfo: Option[Info] = None) {
@@ -57,10 +57,11 @@ case class GameState(currentPlayer: Int,
   private def hint(move: Hint) = {
     require(canHint)
     val id = move.playerId
-    val newClues = clues.updated(id, clues(id) ++ hintToClues(move))
+    val newClues = hintToClues(move)
     copy(
-      clues = newClues,
-      remainingHint = remainingHint - 1).nextPlayer
+      clues = clues + (id -> newClues),
+      remainingHint = remainingHint - 1,
+      lastInfo = Some(Clued(player = id, clues = newClues))).nextPlayer
   }
 
   private def hintToClues(h: Hint): Seq[Clue] = {
@@ -80,7 +81,7 @@ case class GameState(currentPlayer: Int,
     } yield buildHint(pos)
   }
 
-  def cluesFor(player: Int): Vector[Clue] =
+  def cluesFor(player: Int): Seq[Clue] =
     clues(player)
 
   private def playCard(pos: Int) = {
