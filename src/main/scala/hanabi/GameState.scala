@@ -17,6 +17,11 @@ case class GameState(currentPlayer: Int,
   val numPlayer = playersHands.size
   private[state] def activeHand = playersHands(currentPlayer)
 
+  val tableCards = for {
+    (c, max) <- table
+    l <- 1 to max
+  } yield Card(l, c)
+
   def lost = remainingLife == 0
   def won = score == 25
   def finished = won || lost || turnsLeft == Some(0)
@@ -119,7 +124,7 @@ case class GameState(currentPlayer: Int,
       p <- 0 until playersHands.size
       (before, after) = playersHands.splitAt(p)
       others = before ++ after.drop(1)
-      cards = others.flatMap(_.cards).toVector
+      cards = others.flatMap(_.cards).toVector ++ tableCards ++ discarded
     } yield p -> cards): _*)
 
   def isUseless(c: Card) = table.getOrElse(c.color, 0) >= c.level

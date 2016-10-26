@@ -78,10 +78,26 @@ class GameStateSpec extends FlatSpec
       p <- 0 to 2
     } trivialState(3, 5).seenBy(p) should have size 10
   }
-  //  it should "list who sees which cards when cards have been played and discarded" in {
-  //    for {
-  //      p <- 0 to 2
-  //    } stacked.seenBy(p) should have size 10
-  //  }
+
+  it should "list who sees which cards when cards have been played" in {
+    val plays = trivialState(3, 5).play(PlayCard(0)).play(PlayCard(0))
+    for {
+      p <- 0 to 2
+    } plays.seenBy(p) should have size 12
+  }
+
+  it should "list who sees which cards when cards have been discarded" in {
+    val plays = trivialState(3, 5).copy(remainingHint = 3).play(Discard(0)).play(Discard(3)).play(Discard(2))
+    for {
+      p <- 0 to 2
+    } plays.seenBy(p) should have size 13
+  }
+
+  it should "list who sees which cards when cards have been misplayed" in {
+    val plays = trivialState(3, 5).copy(remainingHint = 3).play(PlayCard(0)).play(PlayCard(3)).play(Discard(2))
+    for {
+      p <- 0 to 2
+    } plays.seenBy(p) should have size 13
+  }
 
 }
