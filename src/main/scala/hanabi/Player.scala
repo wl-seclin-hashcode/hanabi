@@ -7,12 +7,19 @@ trait Player {
   def info(action: Info): Unit = {}
 
   def possibleCards(
-    position: Int,
     cardsSeen: Seq[Card],
+    handSize: Int,
     clues: Seq[Clue] = Seq.empty,
-    rules: HanabiRules = SimpleRules) =
-    for {
-      card <- rules.allCards.diff(cardsSeen)
-      if clues.forall(_.matches(card))
-    } yield card
+    rules: HanabiRules = SimpleRules): Map[Int, Seq[Card]] = {
+
+    def possibleCardsImpl(position: Int): Seq[Card] =
+      for {
+        card <- rules.allCards.diff(cardsSeen)
+        if clues.forall(_.matches(card))
+      } yield card
+
+    for (p <- 0 until handSize)
+      yield p -> possibleCardsImpl(p)
+  }.toMap
+
 }
