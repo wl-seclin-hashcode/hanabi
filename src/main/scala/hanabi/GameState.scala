@@ -24,8 +24,8 @@ case class GameState(currentPlayer: Int,
   def play(move: Move) = {
     move match {
       case h: Hint           => hint(h)
-      case PlayCard(cardPos) ⇒ playCard(cardPos)
-      case Discard(cardPos)  ⇒ discard(cardPos)
+      case PlayCard(cardPos) => playCard(cardPos)
+      case Discard(cardPos)  => discard(cardPos)
     }
   }.decrTurnsLeft
 
@@ -59,7 +59,7 @@ case class GameState(currentPlayer: Int,
     val id = move.playerId
     val newClues = hintToClues(move)
     copy(
-      clues = clues + (id -> newClues),
+      clues = clues + (id -> (clues(id) ++ newClues)),
       remainingHint = remainingHint - 1,
       lastInfo = Some(Clued(player = id, clues = newClues))).nextPlayer
   }
@@ -113,6 +113,8 @@ case class GameState(currentPlayer: Int,
       lastInfo = Some(info))
     r.updateDraw(hand).nextPlayer
   }
+
+  lazy val seenBy = Map.empty[Int, Vector[Card]].withDefaultValue(Vector())
 
   def isUseless(c: Card) = table.getOrElse(c.color, 0) >= c.level
   def isKey(c: Card) = c.level == 5 || discarded.contains(c)
