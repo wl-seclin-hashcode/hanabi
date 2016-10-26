@@ -83,4 +83,16 @@ class GameStateSpec extends FlatSpec with Matchers with MockitoSugar with OneIns
     again.cluesFor(2) shouldBe (Vector(ColorClue(Blue, 2), ColorClue(Red, 0)))
   }
 
+  it should "list who sees which cards when no cards have been played or discarded" in {
+    for {
+      p <- 0 to 2
+    } stacked.seenBy(p) should have size 10
+  }
+
+//  it should "list who sees which cards when cards have been played and discarded" in {
+//    for {
+//      p <- 0 to 2
+//    } stacked.seenBy(p) should have size 10
+//  }
+
 }

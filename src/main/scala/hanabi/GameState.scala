@@ -114,7 +114,13 @@ case class GameState(currentPlayer: Int,
     r.updateDraw(hand).nextPlayer
   }
 
-  lazy val seenBy = Map.empty[Int, Vector[Card]].withDefaultValue(Vector())
+  lazy val seenBy: Map[Int, Vector[Card]] = Map(
+    (for {
+      p <- 0 until playersHands.size
+      (before, after) = playersHands.splitAt(p)
+      others = before ++ after.drop(1)
+      cards = others.flatMap(_.cards).toVector
+    } yield p -> cards): _*)
 
   def isUseless(c: Card) = table.getOrElse(c.color, 0) >= c.level
   def isKey(c: Card) = c.level == 5 || discarded.contains(c)
