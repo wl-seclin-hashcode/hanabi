@@ -15,7 +15,7 @@ case class GameState(
     rules: HanabiRules = SimpleRules,
     turnsLeft: Option[Int] = None,
     lastInfo: Option[Info] = None) {
-  
+
   import rules._
 
   val numPlayer = playersHands.size
@@ -32,9 +32,9 @@ case class GameState(
 
   def play(move: Move) = {
     move match {
-      case h: Hint           => hint(h)
-      case Play(cardPos) => playCard(cardPos)
-      case Discard(cardPos)  => discard(cardPos)
+      case h: Hint          => hint(h)
+      case Play(cardPos)    => playCard(cardPos)
+      case Discard(cardPos) => discard(cardPos)
     }
   }.decrTurnsLeft
 
@@ -93,9 +93,11 @@ case class GameState(
   def cluesFor(player: Int): Seq[Clue] =
     clues(player)
 
+  def allowed(c: Card) = c.level == table(c.color) + 1
+
   private def playCard(pos: Int) = {
     val (played, hand) = activeHand.play(pos)
-    val success = played.level == table(played.color) + 1
+    val success = allowed(played)
     val r = if (success)
       copy(
         table = table.updated(played.color, played.level),
