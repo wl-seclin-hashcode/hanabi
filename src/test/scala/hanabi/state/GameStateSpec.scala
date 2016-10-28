@@ -10,13 +10,13 @@ import org.scalatest.Matchers
 import org.scalatest.junit.JUnitRunner
 import hanabi._
 import SimpleRules._
-import hanabi.state.GameState
 
 @RunWith(classOf[JUnitRunner])
 class GameStateSpec extends FlatSpec
     with Matchers with MockitoSugar with OneInstancePerTest with BeforeAndAfter
     with StackedDeck {
 
+  import Cards._
   val game = GameState.initial(4)
 
   "game state" should "initialize properly" in {
@@ -101,4 +101,12 @@ class GameStateSpec extends FlatSpec
     } plays.seenBy(p) should have size 13
   }
 
+  it should "have a force initialisation" in {
+    val hands = Seq(
+      Hand(1 R, 2 R, 4 B, 4 W, 5 R),
+      Hand(1 G, 2 G, 4 Y, 4 Y, 5 Y))
+    val state = GameState.forced(hands)
+
+    state.deck.cards should contain noneOf (4 Y, 5 Y, 5 R)
+  }
 }

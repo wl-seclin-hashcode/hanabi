@@ -5,7 +5,7 @@ import scala.Vector
 
 case class GameState(
     deck: Deck,
-    private[state] val playersHands: IndexedSeq[Hand],
+    private[state] val playersHands: Seq[Hand],
     currentPlayer: Int = 0,
     table: Map[Color, Int] = Map.empty,
     discarded: Seq[Card] = Seq.empty,
@@ -146,6 +146,10 @@ case class GameState(
 }
 
 object GameState {
+  def forced(hands: Seq[Hand], played: Map[Color, Int] = Map.empty, rules: HanabiRules = SimpleRules) = {
+    GameState(deck = Deck(rules.allCards).drop(hands.flatMap(_.cards)), hands)
+  }
+
   def initial(numPlayer: Int, rules: HanabiRules = SimpleRules) = {
     val handSize = if (numPlayer <= 3) 5 else 4
     val (hands, deck) = Deck.shuffle(rules.allCards).deal(numPlayer, handSize)
