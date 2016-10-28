@@ -5,14 +5,24 @@ import hanabi.state.GameState
 
 object StandardPlayer extends Player {
 
-  def nextMove(state: GameState): Move = {
-    import state.rules._
+  type Strategy = GameState => Option[Move]
 
+  val play: Strategy = { state =>
     val myClues = state.cluesFor(state.currentPlayer)
     myClues.sortBy(_.position).headOption match {
-      case Some(ColorClue(color, pos)) => Play(pos)
-      case Some(LevelClue(level, pos)) if withLevel(level).exists(state.allowed) => Play(pos)
-      case _ => Discard(0)
+      case Some(ColorClue(color, pos)) => Some(Play(pos))
+      case Some(LevelClue(level, pos)) if state.rules.withLevel(level).exists(state.allowed) => Some(Play(pos))
+      case _ => None
     }
+  }
+
+  val hint: Strategy = { state =>
+    if (state.canHint)
+      Some(LevelHint(state.nextPlayer, 1))
+    else None
+  }
+
+  def nextMove(state: GameState): Move = {
+    play(state).orElse(hint(state)).get
   }
 }

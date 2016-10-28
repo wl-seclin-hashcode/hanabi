@@ -49,7 +49,9 @@ case class GameState(
     }
   }
 
-  private def nextPlayer: GameState = copy(currentPlayer = (currentPlayer + 1) % numPlayer)
+  def nextPlayer = (currentPlayer + 1) % numPlayer
+
+  private def toNextPlayer: GameState = copy(currentPlayer = nextPlayer)
 
   private def updateDraw(hand: Hand): GameState = {
     val (drawn, newDeck) = deck.draw
@@ -70,7 +72,7 @@ case class GameState(
     copy(
       clues = clues + (id -> (clues(id) ++ newClues)),
       hints = hints - 1,
-      lastInfo = Some(Clued(player = id, clues = newClues))).nextPlayer
+      lastInfo = Some(Clued(player = id, clues = newClues))).toNextPlayer
   }
 
   private def hintToClues(h: Hint): Seq[Clue] = {
@@ -108,7 +110,7 @@ case class GameState(
         discarded = played +: discarded)
 
     val info = Played(currentPlayer, pos, played, success)
-    r.updateDraw(hand).nextPlayer.copy(lastInfo = Some(info))
+    r.updateDraw(hand).toNextPlayer.copy(lastInfo = Some(info))
   }
 
   def canDiscard = hints < MAX_HINTS
@@ -122,7 +124,7 @@ case class GameState(
       discarded = discardedCard +: discarded,
       hints = if (hints < MAX_HINTS) hints + 1 else hints,
       lastInfo = Some(info))
-    r.updateDraw(hand).nextPlayer
+    r.updateDraw(hand).toNextPlayer
   }
 
   //must be hidden outside package to prevent cheats
