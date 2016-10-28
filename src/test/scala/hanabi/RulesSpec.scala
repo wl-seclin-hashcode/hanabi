@@ -14,10 +14,11 @@ import hanabi.ai._
 @RunWith(classOf[JUnitRunner])
 class RulesSpec extends FlatSpec with Matchers with MockitoSugar with OneInstancePerTest with BeforeAndAfter {
   import SimpleRules._
+  import Cards._
 
   "simple rules" should "have proper number of cards" in {
-    count(Card(1, Red)) shouldBe 3
-    count(Card(5, Red)) shouldBe 1
-    count(Card(2, Blue)) shouldBe 2
+    count(1 R) shouldBe 3
+    count(5 R) shouldBe 1
+    count(2 B) shouldBe 2
   }
 }
