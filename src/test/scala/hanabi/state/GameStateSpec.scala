@@ -71,7 +71,7 @@ class GameStateSpec extends FlatSpec
     clued.cluesFor(0) shouldBe empty
 
     val again = clued.play(ColorHint(2, Red))
-    again.cluesFor(2) shouldBe (Vector(ColorClue(Blue, 2), ColorClue(Red, 0)))
+    again.cluesFor(2) shouldBe (Vector(ColorClue(Blue, 2), ColorClue(Red, 4)))
   }
 
   it should "list who sees which cards when no cards have been played or discarded" in {

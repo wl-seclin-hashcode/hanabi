@@ -19,6 +19,8 @@ case class GameState(
   import rules._
 
   val numPlayer = playersHands.size
+  val handSize = playersHands.head.cards.size
+
   private[state] def activeHand = playersHands(currentPlayer)
 
   val tableCards = for {

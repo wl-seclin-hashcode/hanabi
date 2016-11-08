@@ -22,11 +22,12 @@ class DeckSpec extends FlatSpec
   "a Deck" should "distribute cards one by one" in {
     val (h, rest) = Deck(allCards.distinct).deal(hands = 5, cardsPerHand = 5)
     val hnds = h.toVector
+    println(hnds)
     def expected(lvl: Int) = allColors.map(c => Card(lvl, c)).toVector
     for {
       h <- 0 until 5
       (c, i) <- hnds(h).cards.zipWithIndex
-    } c.level should be(i + 1)
+    } c.level should be(5 - i)
   }
 
   //  it should "allow to try to draw from an empty deck an return unchanged deck" in {

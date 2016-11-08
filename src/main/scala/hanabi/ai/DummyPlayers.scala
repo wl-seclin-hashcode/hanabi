@@ -5,12 +5,12 @@ import hanabi.state._
 import hanabi.state.GameState
 
 /**
- * Always plays his left-most card.
+ * Always plays his right-most card.
  */
 object DummyPlayer extends Player {
 
   def nextMove(state: GameState): Move = {
-    Play(0)
+    Play(state.handSize - 1)
   }
 
 }
