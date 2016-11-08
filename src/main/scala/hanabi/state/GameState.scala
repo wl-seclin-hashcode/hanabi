@@ -60,6 +60,15 @@ case class GameState(
     updateHand(hand + drawn).copy(deck = newDeck).checkTurnsLeft
   }
 
+  private def shiftClues(pos: Int) = {
+    val newClues = for {
+      clue <- clues(currentPlayer)
+      if clue.position != pos
+      newPos = if (clue.position < pos) clue.position + 1 else clue.position
+    } yield clue.update(newPos)
+    copy(clues = clues + (currentPlayer -> newClues))
+  }
+
   private def checkTurnsLeft =
     if (deck.empty)
       copy(turnsLeft = turnsLeft orElse Some(playersHands.size + 1))
@@ -112,7 +121,7 @@ case class GameState(
         discarded = played +: discarded)
 
     val info = Played(currentPlayer, pos, played, success)
-    r.updateDraw(hand).toNextPlayer.copy(lastInfo = Some(info))
+    r.updateDraw(hand).shiftClues(pos).toNextPlayer.copy(lastInfo = Some(info))
   }
 
   def canDiscard = hints < MAX_HINTS
@@ -126,7 +135,7 @@ case class GameState(
       discarded = discardedCard +: discarded,
       hints = if (hints < MAX_HINTS) hints + 1 else hints,
       lastInfo = Some(info))
-    r.updateDraw(hand).toNextPlayer
+    r.updateDraw(hand).shiftClues(pos).toNextPlayer
   }
 
   //must be hidden outside package to prevent cheats

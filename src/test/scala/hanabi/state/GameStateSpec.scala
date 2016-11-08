@@ -73,6 +73,23 @@ class GameStateSpec extends FlatSpec
     val again = clued.play(ColorHint(2, Red))
     again.cluesFor(2) shouldBe (Vector(ColorClue(Blue, 2), ColorClue(Red, 4)))
   }
+  
+  it should "update given clues for a discard" in {
+    val clued = reverseState.play(ColorHint(1, Red))
+    clued.cluesFor(1) shouldBe (Vector(ColorClue(Red, 2)))
+
+    val discardPlay = clued.play(Discard(4))
+    
+    discardPlay.cluesFor(1) shouldBe (Vector(ColorClue(Red, 3)))
+  }
+
+  it should "update given clues for a play" in {
+    val clued = reverseState.play(ColorHint(1, Red))
+    clued.cluesFor(1) shouldBe (Vector(ColorClue(Red, 2)))
+
+    clued.play(Play(0)).cluesFor(1) shouldBe (Vector(ColorClue(Red, 2)))
+    clued.play(Play(4)).cluesFor(1) shouldBe (Vector(ColorClue(Red, 3)))
+  }
 
   it should "list who sees which cards when no cards have been played or discarded" in {
     for {
