@@ -37,6 +37,14 @@ class StandardPlayerSpec extends FlatSpec
     board.play(move).lastInfo shouldBe Some(Played(player = 1, pos = 0, card = Card(1, Green), success = true))
   }
 
+  it should "played a second '1' clued card on the next turn" in {
+    val clued= orderedState.play(LevelHint(1, level = 1))
+    val secondTurnPlayer1=clued.play(Play(0)).play(Play(0)).play(Discard(4))
+    println(secondTurnPlayer1.debugString)
+    val move = StandardPlayer.nextMove(secondTurnPlayer1)
+    secondTurnPlayer1.play(move).lastInfo shouldBe Some(Played(player = 1, pos = 1, card = Card(1, White), success = true))
+  }
+
   it should "not play '5' clued cards" in {
     val board = reverseState.play(LevelHint(1, level = 5))
     val move = StandardPlayer.nextMove(board)
