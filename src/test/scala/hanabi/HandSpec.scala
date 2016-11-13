@@ -21,16 +21,17 @@ class HandSpec extends FlatSpec
 
   "a Hand" should "convert color hints to clues" in {
     val h = Hand(2 R, 2 G, 3 B, 1 Y)
-    val clued = h.hint(Blue)
+    val (clued, clues) = h.hint(Blue)
     h.clues shouldBe empty
     clued.clues shouldBe (Vector(ColorClue(Blue, 2)))
+    clues shouldBe (Vector(ColorClue(Blue, 2)))
   }
 
   it should "convert level hints to clues" in {
     val h = Hand(2 R, 2 G, 3 B, 1 Y)
-    val clued = h.hint(2)
-    h.clues shouldBe empty
+    val (clued, clues) = h.hint(2)
     clued.clues shouldBe (Vector(LevelClue(2, 0), LevelClue(2, 1)))
+    clues shouldBe (Vector(LevelClue(2, 0), LevelClue(2, 1)))
   }
 
 }

@@ -11,7 +11,6 @@ case class GameState(
     discarded: Seq[Card] = Seq.empty,
     hints: Int = SimpleRules.MAX_HINTS,
     lives: Int = SimpleRules.INITIAL_LIVES,
-    clues: Map[Int, Seq[Clue]] = Map.empty.withDefaultValue(Vector()),
     rules: HanabiRules = SimpleRules,
     turnsLeft: Option[Int] = None,
     lastInfo: Option[Info] = None) {
@@ -60,15 +59,6 @@ case class GameState(
     updateHand(hand + drawn).copy(deck = newDeck).checkTurnsLeft
   }
 
-  private def shiftClues(pos: Int) = {
-    val newClues = for {
-      clue <- clues(currentPlayer)
-      if clue.position != pos
-      newPos = if (clue.position < pos) clue.position + 1 else clue.position
-    } yield clue.update(newPos)
-    copy(clues = clues + (currentPlayer -> newClues))
-  }
-
   private def checkTurnsLeft =
     if (deck.empty)
       copy(turnsLeft = turnsLeft orElse Some(playersHands.size + 1))
@@ -79,32 +69,14 @@ case class GameState(
   private def hint(move: Hint) = {
     require(canHint)
     val id = move.playerId
-    val newClues = hintToClues(move)
-    copy(
-      clues = clues + (id -> (clues(id) ++ newClues)),
+    val (cluedHand, newClues) = playersHands(move.playerId).hint(move)
+    copy(playersHands = playersHands.updated(move.playerId, cluedHand),
       hints = hints - 1,
       lastInfo = Some(Clued(player = id, clues = newClues))).toNextPlayer
   }
 
-  private def hintToClues(h: Hint): Seq[Clue] = {
-    def matchesClue(c: Card) = h match {
-      case ColorHint(_, color) => c.color == color
-      case LevelHint(_, level) => c.level == level
-    }
-
-    def buildHint(pos: Int) = h match {
-      case ColorHint(_, color) => ColorClue(color, pos)
-      case LevelHint(_, level) => LevelClue(level, pos)
-    }
-
-    for {
-      (card, pos) <- playersHands(h.playerId).cards.zipWithIndex.toSeq
-      if matchesClue(card)
-    } yield buildHint(pos)
-  }
-
   def cluesFor(player: Int): Seq[Clue] =
-    clues(player)
+    playersHands(player).clues
 
   def allowed(c: Card) = c.level == table(c.color) + 1
 
@@ -121,7 +93,7 @@ case class GameState(
         discarded = played +: discarded)
 
     val info = Played(currentPlayer, pos, played, success)
-    r.updateDraw(hand).shiftClues(pos).toNextPlayer.copy(lastInfo = Some(info))
+    r.updateDraw(hand).toNextPlayer.copy(lastInfo = Some(info))
   }
 
   def canDiscard = hints < MAX_HINTS
@@ -135,7 +107,7 @@ case class GameState(
       discarded = discardedCard +: discarded,
       hints = if (hints < MAX_HINTS) hints + 1 else hints,
       lastInfo = Some(info))
-    r.updateDraw(hand).shiftClues(pos).toNextPlayer
+    r.updateDraw(hand).toNextPlayer
   }
 
   //must be hidden outside package to prevent cheats
