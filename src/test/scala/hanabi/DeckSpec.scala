@@ -2,7 +2,7 @@ package hanabi
 
 import state._
 
-import org.scalatest.mock.MockitoSugar
+import org.scalatest.mockito.MockitoSugar
 import org.scalatest.BeforeAndAfter
 import org.junit.runner.RunWith
 import org.scalatest.OneInstancePerTest

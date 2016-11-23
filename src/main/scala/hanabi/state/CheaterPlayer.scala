@@ -1,7 +1,6 @@
 package hanabi.state
 
 import hanabi._
-import hanabi.state.GameState
 
 object CheaterPlayer extends Player {
 
