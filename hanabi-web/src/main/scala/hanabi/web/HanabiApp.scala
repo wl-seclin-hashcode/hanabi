@@ -21,8 +21,8 @@ object HanabiApp extends JSApp {
 
   def updateUI(state: GameState) = {
     jQuery("#clues span").attr("class", (i: Int) ⇒ if (i < state.remainingHint) "clue" else "used-clue")
-    jQuery("#lifes span").attr("class", (i: Int) ⇒ if (i < hanabi.MAX_LIFE - state.remainingLife) "used-life" else "life")
-    jQuery("#hands div").each((i:Int, elem: Element) ⇒ updateHand(state.playersHands(i), elem))
+    jQuery("#lives span").attr("class", (i: Int) ⇒ if (i < hanabi.MAX_LIFE - state.remainingLife) "used-life" else "life")
+    jQuery(".hand").each((i:Int, elem: Element) ⇒ updateHand(state.playersHands(i), elem))
     for { (color, level) ← state.table }
       jQuery(s"#table .card-$color").html(if (level==0) "&nbsp;" else level.toString)
     addUiClasses()

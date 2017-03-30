@@ -6,6 +6,37 @@ div {
     padding-top: 0.7em;
     padding-bottom: 0.7em;
 }
+
+.control-clue {
+    display: inline-table;
+    vertical-align: middle;
+    padding-top: 0;
+    border-spacing: 5px;
+    padding-left: 2em;
+}
+.control-clue div {
+    display: table-row-group;
+}
+.control-clue span {
+    opacity: 0.5;
+    display: table-cell;
+    width: 1.5em;
+    height: 1.5em;
+    border-radius: 1em;
+    text-align: center;
+    border-style: solid;
+    border-width: 1px;
+    font-family: monospace;
+}
+.control-clue span:hover {
+    opacity: 1;
+    cursor: default;
+}
+
+.hand {
+    display: inline;
+}
+
 .card {
     position: relative;
     box-sizing: content-box;
