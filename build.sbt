@@ -11,5 +11,5 @@ lazy val `hanabi-web` = project
   .enablePlugins(ScalaJSPlugin)
   .dependsOn(hanabi)
   .settings(
-    libraryDependencies += "be.doeraene" %%% "scalajs-jquery" % "0.9.0"
+    libraryDependencies += "be.doeraene" %%% "scalajs-jquery" % "0.9.1"
   )
