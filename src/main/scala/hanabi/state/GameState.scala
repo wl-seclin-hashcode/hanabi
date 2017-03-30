@@ -1,7 +1,6 @@
 package hanabi.state
 
 import hanabi._
-import scala.Vector
 
 case class GameState(
     deck: Deck,
@@ -22,6 +21,9 @@ case class GameState(
 
   private[state] def activeHand = playersHands(currentPlayer)
 
+  //other players hands are visible, first element is next player hand
+  val inactiveHands = playersHands.drop(currentPlayer) ++ playersHands.take(currentPlayer-1)
+
   val tableCards = for {
     (c, max) <- table
     l <- 1 to max
@@ -29,7 +31,7 @@ case class GameState(
 
   def lost = lives == 0
   def won = score == 25
-  def finished = won || lost || turnsLeft == Some(0)
+  def finished = won || lost || turnsLeft.contains(0)
 
   def play(move: Move) = {
     move match {

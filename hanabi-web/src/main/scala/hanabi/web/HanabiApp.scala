@@ -1,6 +1,7 @@
 package hanabi.web
 
-import hanabi.{GameState, Hand, LevelHint, PlayCard}
+import hanabi.state.GameState
+import hanabi.{Hand, LevelHint, Play}
 import org.scalajs.dom.Element
 import org.scalajs.jquery.jQuery
 
@@ -15,14 +16,14 @@ import scala.scalajs.js.JSApp
 object HanabiApp extends JSApp {
 
   def initUI = updateUI(GameState.initial(4)
-    .play(PlayCard(0))
+    .play(Play(0))
     .play(LevelHint(0,1))
   )
 
   def updateUI(state: GameState) = {
-    jQuery("#clues span").attr("class", (i: Int) ⇒ if (i < state.remainingHint) "clue" else "used-clue")
-    jQuery("#lives span").attr("class", (i: Int) ⇒ if (i < hanabi.MAX_LIFE - state.remainingLife) "used-life" else "life")
-    jQuery(".hand").each((i:Int, elem: Element) ⇒ updateHand(state.playersHands(i), elem))
+    jQuery("#clues span").attr("class", (i: Int) ⇒ if (i < state.hints) "clue" else "used-clue")
+    jQuery("#lives span").attr("class", (i: Int) ⇒ if (i < state.rules.INITIAL_LIVES - state.lives) "used-life" else "life")
+    jQuery(".hand").each((i:Int, elem: Element) ⇒ updateHand(state.inactiveHands(i), elem))
     for { (color, level) ← state.table }
       jQuery(s"#table .card-$color").html(if (level==0) "&nbsp;" else level.toString)
     addUiClasses()
