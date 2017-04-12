@@ -22,7 +22,7 @@ case class GameState(
   private[state] def activeHand = playersHands(currentPlayer)
 
   //other players hands are visible, first element is next player hand
-  val inactiveHands = playersHands.drop(currentPlayer) ++ playersHands.take(currentPlayer-1)
+  val inactiveHands = playersHands.drop(currentPlayer+1) ++ playersHands.take(currentPlayer)
 
   val tableCards = for {
     (c, max) <- table
