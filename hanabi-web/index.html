@@ -22,13 +22,17 @@
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.11.1/jquery.min.js"></script>
     <!-- Include all compiled plugins (below), or include individual files as needed -->
     <script src="js/bootstrap.min.js"></script>
+    <!-- Vue.js -->
+    <script src="https://unpkg.com/vue"></script>
 
     <!-- Include Scala.js compiled code -->
-    <script type="text/javascript" src="./target/scala-2.11/hanabi-web-fastopt.js"></script>
+    <script type="text/javascript" src="./target/scala-2.12/hanabi-web-fastopt.js"></script>
     <!-- Run HanabiApp -->
     <script type="text/javascript">
         hanabi.web.HanabiApp().main();
     </script>
+
+    <div id="main">
 
     <div id="table">
         Table:
@@ -52,64 +56,31 @@
     </div>
 
     <div id="hands">
-        <div>
-            Player 1 :
+        <div v-for="(hand, playerIdx) in oppHands" :key="playerIdx">
+            Player {{playerIdx+1}} :
             <div class="hand">
-                <span class="card card-Red">1</span>
-                <span class="card card-Blue">3</span>
-                <span class="card card-Yellow">4</span>
-                <span class="card card-Green">3</span>
+                <span v-for="(card, cardIdx) in hand.cards" :key="card.debugString">
+                    <hanabi-card  :card="card"></hanabi-card><span v-for="clue in hand.clues[cardIdx]" class="given-clue" :class="'card-' + clue.color">{{clue.level || '&nbsp;'}}</span>
+                </span>
             </div>
             <div class="control-clue">
-                <div class="level-clue"><span>1</span> <span>2</span> <span>3</span> <span>4</span> <span>5</span></div>
-                <div class="color-clue"><span class="card-Red"></span><span class="card-Blue"></span><span class="card-Green"></span><span class="card-White"></span><span class="card-Yellow"></span></div>
-            </div>
-        </div>
-        <div>
-            Player 2 :
-            <div class="hand">
-                <span class="card card-Red">1</span>
-                <span class="card card-Blue">3</span>
-                <span class="card card-Yellow">4</span>
-                <span class="card card-Green">3</span>
-            </div>
-            <div class="control-clue">
-                <div class="level-clue"><span>1</span> <span>2</span> <span>3</span> <span>4</span> <span>5</span></div>
-                <div class="color-clue"><span class="card-Red"></span><span class="card-Blue"></span><span class="card-Green"></span><span class="card-White"></span><span class="card-Yellow"></span></div>
-            </div>
-        </div>
-        <div>
-            Player 3 :
-            <div class="hand">
-                <span class="card card-Red">1</span>
-                <span class="card card-Blue">3</span>
-                <span class="card card-Yellow">4</span>
-                <span class="card card-Green">3</span>
-            </div>
-            <div class="control-clue">
-                <div class="level-clue"><span>1</span> <span>2</span> <span>3</span> <span>4</span> <span>5</span></div>
-                <div class="color-clue"><span class="card-Red"></span><span class="card-Blue"></span><span class="card-Green"></span><span class="card-White"></span><span class="card-Yellow"></span></div>
+                <div class="level-clue"><span v-for="level in 5" @click="levelHint(playerIdx, level)">{{level}}</span></div>
+                <div class="color-clue"><span v-for="color in allowedColorHints" @click="colorHint(playerIdx, color)" :class="'card-' + color"></span></div>
             </div>
         </div>
     </div>
 
     <div id="my-hand">
         &emsp;&emsp;You :
-        <span class="glyphicon glyphicon-remove-circle action trash"></span><span class="glyphicon glyphicon-upload action play"></span><span class="card card-back">&nbsp;</span>
-        <span class="glyphicon glyphicon-remove-circle action trash"></span><span class="glyphicon glyphicon-upload action play"></span><span class="card card-back">&nbsp;</span>
-        <span class="glyphicon glyphicon-remove-circle action trash"></span><span class="glyphicon glyphicon-upload action play"></span><span class="card card-back">&nbsp;</span>
-        <span class="glyphicon glyphicon-remove-circle action trash"></span><span class="glyphicon glyphicon-upload action play"></span><span class="card card-back">&nbsp;</span>
+        <span v-for="cardIdx in oppHands.length ? oppHands[0].cards.length : 0">
+        <span class="glyphicon glyphicon-remove-circle action trash" @click="trash(cardIdx-1)"></span><span class="glyphicon glyphicon-upload action play" @click="play(cardIdx-1)"></span><span class="card card-back">&nbsp;</span><span v-for="clue in myClues[cardIdx-1]" class="given-clue" :class="'card-' + clue.color">{{clue.level || '&nbsp;'}}</span>
+        </span>
     </div>
 
     <div id="discard">
-        Discard:
-        <span class="card card-red">1</span>
-        <span class="card card-blue">3</span>
-        <span class="card card-yellow">4</span>
-        <span class="card card-green">3</span>
-        <span class="card card-white">1</span>
-        <span class="card card-white">1</span>
-        <span class="card card-white">1</span>
+        Discard :
+        <hanabi-card v-for="card in discard" :key="card.debugString" :card="card"></hanabi-card>
+    </div>
     </div>
   </body>
 </html>

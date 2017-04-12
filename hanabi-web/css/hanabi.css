@@ -33,6 +33,20 @@ div {
     cursor: default;
 }
 
+.given-clue {
+    display: inline-block;
+    width: 1.5em;
+    height: 1.5em;
+    border-radius: 1em;
+    border-style: solid;
+    border-width: 1px;
+    font-family: monospace;
+    font-size: x-small;
+    text-align: center;
+    margin-left: -2px;
+    margin-right: 3px;
+}
+
 .hand {
     display: inline;
 }
@@ -44,6 +58,8 @@ div {
     border: thin solid;
     font-size: xx-large;
     padding: 0.3em;
+    margin-left: 5px;
+    margin-right: 5px;
 }
 
 .card-back {

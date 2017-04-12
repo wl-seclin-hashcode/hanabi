@@ -1,5 +1,8 @@
 package hanabi
 
+import scala.scalajs.js.annotation.JSExportAll
+
+@JSExportAll
 case class Card(level: Int, color: Color) {
   def debugString = {
     val c = color.toString.head

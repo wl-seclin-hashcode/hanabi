@@ -1,11 +1,15 @@
 package hanabi.web
 
+import com.felstar.scalajs.vue.{Vue, VueOptions}
+import hanabi._
 import hanabi.state.GameState
-import hanabi.{Hand, LevelHint, Play}
-import org.scalajs.dom.Element
 import org.scalajs.jquery.jQuery
 
-import scala.scalajs.js.JSApp
+import scala.scalajs.js
+import scala.scalajs.js.Dynamic.literal
+import scala.scalajs.js.JSConverters._
+import scala.scalajs.js.annotation.ScalaJSDefined
+import scala.scalajs.js.{Dictionary, JSApp}
 
 /**
   * Created with IntelliJ IDEA.
@@ -15,32 +19,73 @@ import scala.scalajs.js.JSApp
   */
 object HanabiApp extends JSApp {
 
-  def initUI = updateUI(GameState.initial(4)
-    .play(Play(0))
-    .play(LevelHint(0,1))
-  )
+  val rules = SimpleRules
+  var state = GameState.initial(2, rules)
 
-  def updateUI(state: GameState) = {
+  def toPlayerId(playerIdx: Int): Int = (state.currentPlayer + playerIdx + 1) % state.numPlayer
+
+  def initUI() = {
+    Vue.component("hanabi-card", literal(
+      template = """<span class="card" :class="'card-' + card.color">{{card.level$1 == 0 ? '&nbsp;' : card.level}}</span>""",
+      props = js.Array("card")
+    ))
+    val vm = new Vue(new VueOptions {
+      override val el = "#main"
+
+      override val data = new HanabiVue() {
+        override val allowedColorHints = rules.allowedColorHints.toJSArray
+      }
+      override val methods = Dictionary[js.ThisFunction](
+        "levelHint" → ((vm: HanabiVue, playerIdx: Int, level: Int) ⇒
+          play(vm, LevelHint(toPlayerId(playerIdx), level))),
+        "colorHint" → ((vm: HanabiVue, playerIdx: Int, color: Color) ⇒
+          play(vm, ColorHint(toPlayerId(playerIdx), color))),
+        "trash" → ((vm: HanabiVue, cardIdx: Int) ⇒
+          play(vm, Discard(cardIdx))),
+        "play" → ((vm: HanabiVue, cardIdx: Int) ⇒
+          play(vm, Play(cardIdx)))
+      )
+    }).asInstanceOf[HanabiVue with Vue]
+
+    updateUI(vm)
+  }
+
+  def updateUI(vm: HanabiVue) = {
+    def cluesByPosition(clues: Seq[Clue]) = clues.groupBy(_.position.toString).mapValues(_.toJSArray).toJSDictionary
+
     jQuery("#clues span").attr("class", (i: Int) ⇒ if (i < state.hints) "clue" else "used-clue")
     jQuery("#lives span").attr("class", (i: Int) ⇒ if (i < state.rules.INITIAL_LIVES - state.lives) "used-life" else "life")
-    jQuery(".hand").each((i:Int, elem: Element) ⇒ updateHand(state.inactiveHands(i), elem))
-    for { (color, level) ← state.table }
-      jQuery(s"#table .card-$color").html(if (level==0) "&nbsp;" else level.toString)
-    addUiClasses()
-  }
-
-  def updateHand(hand: Hand, elem: Element) = {
-    val cards = jQuery(elem).children(".card")
-    cards.attr("class", (i:Int) ⇒ s"card card-${hand.cards(i).color.toString}")
-    cards.each((i:Int, card: Element) ⇒ jQuery(card).text(hand.cards(i).level.toString))
-  }
-
-  def addUiClasses() = {
     jQuery(".clue, .used-clue").addClass("glyphicon glyphicon-info-sign")
     jQuery(".life, .used-life").addClass("glyphicon glyphicon-remove-sign")
+    //jQuery(".hand").each((i: Int, elem: Element) ⇒ updateHand(state.inactiveHands(i), elem))
+    for {(color, level) ← state.table}
+      jQuery(s"#table .card-$color").html(if (level == 0) "&nbsp;" else level.toString)
+
+    vm.oppHands = state.inactiveHands.map { hand ⇒
+            literal(
+              cards = hand.cards.toJSArray,
+              clues = cluesByPosition(hand.clues)
+            ): js.Object
+          }.toJSArray
+    vm.discard = state.discarded.toJSArray
+    vm.myClues = cluesByPosition(state.cluesFor(state.currentPlayer))
+  }
+
+  def play(vm: HanabiVue, move: Move) = {
+    println(s"Play Move $move")
+    state = state.play(move)
+    updateUI(vm)
   }
 
   override def main() = {
     jQuery(initUI _)
   }
+}
+
+@ScalaJSDefined
+class HanabiVue extends js.Object {
+  var oppHands: js.Array[js.Object] = js.Array()
+  var myClues: js.Dictionary[js.Array[Clue]] = js.Dictionary()
+  var discard: js.Array[Card] = js.Array()
+  val allowedColorHints: js.Array[Color] = js.Array()
 }
